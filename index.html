@@ -164,6 +164,23 @@ body{
   filter:blur(8px);pointer-events:none;
 }
 
+/* Compass direction labels around the scene */
+.compass{
+  position:absolute;inset:0;pointer-events:none;z-index:5;
+}
+.cp{
+  position:absolute;
+  font-family:var(--m);font-size:10px;font-weight:700;letter-spacing:.2em;
+  color:var(--t2);
+  padding:3px 7px;border-radius:5px;
+  background:rgba(4,5,11,.55);border:1px solid var(--bdr);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.cp-n{top:10px;left:50%;transform:translateX(-50%);color:var(--blue);border-color:rgba(79,142,247,.3)}
+.cp-s{bottom:10px;left:50%;transform:translateX(-50%)}
+.cp-w{left:10px;top:50%;transform:translateY(-50%)}
+.cp-e{right:10px;top:50%;transform:translateY(-50%)}
+
 .mattress{
   position:relative;
   width:210px;height:210px;
@@ -359,7 +376,7 @@ body{
 }
 .log-chip .dim{color:var(--t2);margin-left:4px}
 
-.log-list{display:flex;flex-direction:column;gap:4px;max-height:340px;overflow-y:auto}
+.log-list{display:flex;flex-direction:column;gap:4px}
 .log-row{
   display:flex;align-items:center;gap:10px;
   background:rgba(255,255,255,.022);border:1px solid transparent;
@@ -472,6 +489,12 @@ body{
     </div>
 
     <div class="scene-3d">
+      <div class="compass">
+        <div class="cp cp-n">N · СЕВЕР</div>
+        <div class="cp cp-e">E</div>
+        <div class="cp cp-s">S</div>
+        <div class="cp cp-w">W</div>
+      </div>
       <div class="mattress" id="mattress">
         <!-- TOP face A -->
         <div class="face f-top">
@@ -511,8 +534,8 @@ body{
         <div class="state-val"><span id="sideBadge" class="accent-o">A</span></div>
       </div>
       <div class="state-box">
-        <div class="state-lbl">Угол (ИЗГОЛ.)</div>
-        <div class="state-val"><span id="rotBadge" class="accent-b">0°</span></div>
+        <div class="state-lbl">Изголовье смотрит</div>
+        <div class="state-val"><span id="rotBadge" class="accent-b">Север</span></div>
       </div>
     </div>
   </section>
@@ -521,7 +544,7 @@ body{
   <section class="card rec-card ac-g">
     <div class="rec-head">
       <div class="rec-title">Следующая смена</div>
-      <div class="rec-count" id="recCount">ЦИКЛ · 1/4</div>
+      <div class="rec-count" id="recCount">ШАГ · 1/8</div>
     </div>
     <div class="rec-hero">
       <div class="rec-action" id="recAction">Повернуть на 90° по часовой</div>
@@ -597,56 +620,87 @@ body{
    MATRAX · mattress rotation tracker
    
    STATE MODEL
-   ─ state = { side: 'A'|'B', rot: 0|90|180|270 }
+   ─ state = { side: 'A'|'B', dir: 'N'|'E'|'S'|'W' }
    ─ side: какая сторона сейчас сверху
-   ─ rot:  угол поворота матраса по часовой (вокруг вертикальной оси)
-            0° = изголовье на "север" (как было изначально)
+   ─ dir:  куда смотрит изголовье (HEAD): N=Север, E=Восток, S=Юг, W=Запад
    
-   RECOMMENDED CYCLE (каждая смена белья):
-   ─ Чередуем: только поворот +90° / только flip (сторона)
-   ─ Полный цикл за 4 шага возвращает матрас в исходное состояние,
-     при этом все 4 угла и обе стороны получают равномерный износ.
+   CYCLE (8 шагов — чередуем flip и поворот на 90° вправо):
    
-   STEP 0 → 1: rotate +90°   (A, 0°)   → (A, 90°)
-   STEP 1 → 2: flip          (A, 90°)  → (B, 90°)   [с доп. поворотом см. ниже]
-   STEP 2 → 3: rotate +90°   (B, 90°)  → (B, 180°)
-   STEP 3 → 0: flip          (B, 180°) → (A, 0°)
-   
-   Такой паттерн — комбинация "head-to-foot flip" и "side-to-side rotation",
-   рекомендуемая большинством производителей матрасов для равномерного износа.
+   STEP 0: A, Север     ← старт
+   STEP 1: B, Север      (flip: A→B)
+   STEP 2: B, Запад      (поворот 90° вправо: Север→Запад)
+   STEP 3: A, Запад      (flip: B→A)
+   STEP 4: A, Юг         (поворот 90° вправо: Запад→Юг)
+   STEP 5: B, Юг         (flip: A→B)
+   STEP 6: B, Восток     (поворот 90° вправо: Юг→Восток)
+   STEP 7: A, Восток     (flip: B→A)
+   STEP 8→0: A, Север    (поворот 90° вправо: Восток→Север) — полный цикл
+
+   Полный цикл = 8 смен белья. Все 4 ориентации × 2 стороны.
 ═══════════════════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'matrax_state_v1';
-const LOG_KEY = 'matrax_log_v1';
+const STORAGE_KEY = 'matrax_state_v2';
+const LOG_KEY = 'matrax_log_v2';
 
 const CYCLE = [
-  { side:'A', rot:0   },
-  { side:'A', rot:90  },
-  { side:'B', rot:90  },
-  { side:'B', rot:180 },
+  { side:'A', dir:'N' },  // 0 · старт
+  { side:'B', dir:'N' },  // 1 · flip
+  { side:'B', dir:'W' },  // 2 · rotate
+  { side:'A', dir:'W' },  // 3 · flip
+  { side:'A', dir:'S' },  // 4 · rotate
+  { side:'B', dir:'S' },  // 5 · flip
+  { side:'B', dir:'E' },  // 6 · rotate
+  { side:'A', dir:'E' },  // 7 · flip
+  // next loops back to step 0 (rotate: E → N)
 ];
 
+// Маппинг направления изголовья в визуальный угол Z
+// Север=0°, Запад=90° (вправо = по часовой при виде сверху), Юг=180°, Восток=270°
+const DIR_TO_DEG = { N:0, W:90, S:180, E:270 };
+const DIR_RU = { N:'Север', W:'Запад', S:'Юг', E:'Восток' };
+const DIR_EN = { N:'N', W:'W', S:'S', E:'E' };
+
 const STEP_TEXT = [
-  // index = current step (0..3), описывает переход step → (step+1)%4
-  {
-    action: 'Повернуть на 90° по часовой',
-    detail: 'При смене белья сместите изголовье на правую боковину. Сторону не переворачиваем.',
-    chips: ['rot'],
-  },
-  {
-    action: 'Перевернуть на другую сторону',
-    detail: 'Переверните матрас через длинную сторону — теперь сверху сторона B. Изголовье остаётся там же.',
+  // i описывает переход step i → i+1
+  { // 0 → 1
+    action: 'Перевернуть матрас: A → B',
+    detail: 'Переверните матрас на другую сторону. Изголовье остаётся на Севере, сверху теперь сторона B.',
     chips: ['flip'],
   },
-  {
-    action: 'Повернуть на 90° по часовой',
-    detail: 'Сместите изголовье на правую боковину. Сторону не меняем — сейчас сверху B.',
+  { // 1 → 2
+    action: 'Повернуть на 90° вправо',
+    detail: 'Проверните матрас по часовой. Изголовье переезжает с Севера на Запад. Сторону не трогаем — B остаётся сверху.',
     chips: ['rot'],
   },
-  {
-    action: 'Перевернуть на сторону A',
-    detail: 'Переверните матрас — возвращаемся к стороне A, полный цикл завершён.',
+  { // 2 → 3
+    action: 'Перевернуть матрас: B → A',
+    detail: 'Переверните матрас. Изголовье остаётся на Западе, сверху снова сторона A.',
     chips: ['flip'],
+  },
+  { // 3 → 4
+    action: 'Повернуть на 90° вправо',
+    detail: 'Проверните матрас по часовой. Изголовье переезжает с Запада на Юг. Сторона A сверху.',
+    chips: ['rot'],
+  },
+  { // 4 → 5
+    action: 'Перевернуть матрас: A → B',
+    detail: 'Переверните матрас. Изголовье остаётся на Юге, сверху теперь B.',
+    chips: ['flip'],
+  },
+  { // 5 → 6
+    action: 'Повернуть на 90° вправо',
+    detail: 'Проверните матрас по часовой. Изголовье переезжает с Юга на Восток. Сторона B сверху.',
+    chips: ['rot'],
+  },
+  { // 6 → 7
+    action: 'Перевернуть матрас: B → A',
+    detail: 'Переверните матрас. Изголовье остаётся на Востоке, сверху снова сторона A.',
+    chips: ['flip'],
+  },
+  { // 7 → 0
+    action: 'Повернуть на 90° вправо',
+    detail: 'Проверните матрас по часовой. Изголовье возвращается на Север — полный цикл завершён!',
+    chips: ['rot'],
   },
 ];
 
@@ -728,18 +782,18 @@ function plural(n, forms){
 /* ─────────────── RENDER 3D ─────────────── */
 function render3D(animated){
   const current = CYCLE[state.step];
-  // compute target visual angles, tracking accumulators for continuous motion
+  // Y = flip сторона (0 = A сверху, 180 = B сверху)
+  // Z = направление изголовья (N=0, W=90, S=180, E=270)
   const targetRotY = (current.side === 'B') ? 180 : 0;
-  const targetRotZ = current.rot; // visual "around vertical" when viewed top-down maps to Z in our 3D box
+  const targetRotZ = DIR_TO_DEG[current.dir];
 
-  // Choose shortest rotation delta and add to accumulator
+  // Выбираем кратчайшее направление поворота, чтобы не было обратного вращения
   const deltaY = shortestDelta(visualRotY % 360, targetRotY);
   const deltaZ = shortestDelta(visualRotZ % 360, targetRotZ);
   visualRotY += deltaY;
   visualRotZ += deltaZ;
 
   mattress.style.transition = animated ? 'transform 1.1s cubic-bezier(.65,.05,.25,1)' : 'transform 0s';
-  // Slight X tilt so we see the top face nicely; Y for flip; Z for rotation on bed
   mattress.style.transform = 'rotateX(-22deg) rotateY('+visualRotY+'deg) rotateZ('+visualRotZ+'deg)';
 }
 function shortestDelta(from, to){
@@ -750,13 +804,12 @@ function shortestDelta(from, to){
 /* ─────────────── RENDER UI ─────────────── */
 function render(animated){
   const current = CYCLE[state.step];
-  const next = (state.step + 1) % 4;
   const rec = STEP_TEXT[state.step];
 
-  // side & rot badges
+  // side & direction badges
   sideBadge.textContent = current.side;
   sideBadge.className = current.side === 'A' ? 'accent-o' : 'accent-v';
-  rotBadge.textContent = current.rot + '°';
+  rotBadge.textContent = DIR_RU[current.dir];
   rotBadge.className = 'accent-b';
 
   // since
@@ -765,10 +818,10 @@ function render(animated){
   // recommendation
   recAction.textContent = rec.action;
   recDetail.textContent = rec.detail;
-  recCount.textContent = 'ШАГ · ' + (state.step+1) + '/4';
+  recCount.textContent = 'ШАГ · ' + (state.step+1) + '/8';
   recMoves.innerHTML = rec.chips.map(c => {
-    if(c === 'rot') return '<span class="move-chip mc-rot">↻ +90° поворот</span>';
-    if(c === 'flip') return '<span class="move-chip mc-flip">⇅ flip сторона</span>';
+    if(c === 'rot') return '<span class="move-chip mc-rot">↻ +90° вправо</span>';
+    if(c === 'flip') return '<span class="move-chip mc-flip">⇅ flip стороны</span>';
     return '';
   }).join('');
 
@@ -797,14 +850,16 @@ function renderLog(){
     const from = e.from;
     const to = e.to;
     const arrows = [];
-    if(e.rotated) arrows.push('<div class="log-arr la-rot" title="Поворот +90°">↻</div>');
-    if(e.flipped) arrows.push('<div class="log-arr la-flip" title="Flip">⇅</div>');
+    if(e.rotated) arrows.push('<div class="log-arr la-rot" title="Поворот +90° вправо">↻</div>');
+    if(e.flipped) arrows.push('<div class="log-arr la-flip" title="Flip стороны">⇅</div>');
+    const fromStr = from.side + '·' + DIR_EN[from.dir];
+    const toStr = to.side + '·' + DIR_EN[to.dir];
     rows.push(
       '<div class="log-row">'+
         '<div class="log-num">'+(i+1).toString().padStart(2,'0')+'</div>'+
         '<div class="log-body">'+
           '<div class="log-date">'+fmtDate(e.ts)+'</div>'+
-          '<div class="log-transition">'+from.side+'·'+from.rot+'° → '+to.side+'·'+to.rot+'°</div>'+
+          '<div class="log-transition">'+fromStr+' → '+toStr+'</div>'+
         '</div>'+
         '<div class="log-arrows">'+arrows.join('')+'</div>'+
       '</div>'
@@ -819,9 +874,9 @@ function confirmChange(){
   animLock = true;
 
   const from = {...CYCLE[state.step]};
-  const nextStep = (state.step + 1) % 4;
+  const nextStep = (state.step + 1) % CYCLE.length;
   const to = {...CYCLE[nextStep]};
-  const rotated = from.rot !== to.rot;
+  const rotated = from.dir !== to.dir;
   const flipped = from.side !== to.side;
 
   const entry = {
@@ -909,7 +964,7 @@ setInterval(()=>{ sinceLabel.textContent = fmtSince(state.lastChange); }, 30000)
 // Set visual accumulator to match saved state on first paint (no animation)
 const initial = CYCLE[state.step];
 visualRotY = initial.side === 'B' ? 180 : 0;
-visualRotZ = initial.rot;
+visualRotZ = DIR_TO_DEG[initial.dir];
 render(false);
 
 // Service worker for PWA / offline

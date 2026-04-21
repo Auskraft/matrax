@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#04050b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Matrax">
+<title>Matrax · Ротация матраса</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#04050b;
+  --c1:rgba(14,16,30,0.85);
+  --c2:rgba(20,23,42,0.6);
+  --bdr:rgba(255,255,255,0.055);
+  --bdr2:rgba(255,255,255,0.12);
+  --blue:#4f8ef7;
+  --violet:#7c5cfc;
+  --green:#00e5a0;
+  --red:#ff5e5e;
+  --yellow:#ffc145;
+  --orange:#ff8c00;
+  --t1:#e2eaf8;
+  --t2:#4e5a78;
+  --t3:#1e2540;
+  --f:'Syne',sans-serif;
+  --m:'JetBrains Mono',monospace;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+html,body{
+  width:100%;min-height:100vh;min-height:100dvh;
+  background:var(--bg);color:var(--t1);font-family:var(--f);
+  overflow-x:hidden;overscroll-behavior:none;
+}
+body{
+  padding-top:var(--safe-t);padding-bottom:var(--safe-b);
+  user-select:none;-webkit-user-select:none;
+}
+::-webkit-scrollbar{width:0;height:0}
+
+/* ══════════════════ BACKGROUND ══════════════════ */
+.bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-scene::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:24px 24px;
+  mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,black 20%,transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,black 20%,transparent 80%);
+}
+.au1{position:absolute;top:-180px;right:-120px;width:520px;height:420px;border-radius:50%;
+  background:conic-gradient(from 185deg at 58% 22%,
+    #c8300099 0deg,#ff6b2b88 30deg,#ff8c0066 65deg,
+    #ffb34744 95deg,#ff4e0022 130deg,#7c5cfc11 185deg,transparent 250deg);
+  filter:blur(70px);
+  animation:auA 16s ease-in-out infinite alternate}
+.au2{position:absolute;top:-100px;right:0;width:320px;height:240px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(240,90,20,.22) 0%,transparent 68%);
+  filter:blur(40px);
+  animation:auB 10s ease-in-out infinite alternate-reverse}
+.au3{position:absolute;top:40%;left:-100px;width:340px;height:260px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(79,142,247,.08) 0%,transparent 70%);
+  filter:blur(50px);
+  animation:auB 18s ease-in-out infinite alternate}
+.au4{position:absolute;bottom:-60px;right:-40px;width:380px;height:240px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(124,92,252,.07) 0%,transparent 70%);
+  filter:blur(60px)}
+@keyframes auA{from{transform:translate(0,0) scale(1);opacity:.9}to{transform:translate(-40px,20px) scale(1.1);opacity:.6}}
+@keyframes auB{from{transform:translate(0,0)}to{transform:translate(20px,-15px) scale(1.08)}}
+
+/* ══════════════════ LAYOUT ══════════════════ */
+.app{
+  position:relative;z-index:2;
+  width:100%;max-width:480px;margin:0 auto;
+  display:flex;flex-direction:column;
+  padding:14px 14px 20px;gap:12px;
+  min-height:100dvh;
+}
+
+/* ══════════════════ HEADER ══════════════════ */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 2px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,#ff8c00,#ffb347);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--m);font-size:11px;font-weight:700;color:#000;
+  box-shadow:0 0 20px rgba(255,140,0,.4),inset 0 1px 0 rgba(255,255,255,.3);
+}
+.logo-text{
+  font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.6) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.logo-sub{font-size:8.5px;color:var(--t2);font-weight:500;letter-spacing:.1em;margin-top:1px;font-family:var(--m)}
+.live-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);
+  border-radius:20px;padding:4px 10px;
+  font-family:var(--m);font-size:8.5px;font-weight:600;letter-spacing:.1em;color:var(--green);
+}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3;transform:scale(.7)}}
+
+/* ══════════════════ CARD ══════════════════ */
+.card{
+  background:var(--c1);
+  border:1px solid var(--bdr);
+  border-radius:18px;
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  display:flex;flex-direction:column;
+  overflow:hidden;position:relative;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+  pointer-events:none;
+}
+.card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 60%);
+  pointer-events:none;border-radius:18px;
+}
+.card>*{position:relative;z-index:1}
+.clbl{font-size:8.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t2)}
+
+.ac-o::before{background:linear-gradient(90deg,transparent,rgba(255,140,0,.55),transparent)}
+.ac-b::before{background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)}
+.ac-g::before{background:linear-gradient(90deg,transparent,rgba(0,229,160,.5),transparent)}
+.ac-v::before{background:linear-gradient(90deg,transparent,rgba(124,92,252,.5),transparent)}
+
+/* ══════════════════ 3D MATTRESS SCENE ══════════════════ */
+.scene-card{padding:16px 16px 14px;gap:6px}
+.scene-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.scene-title{display:flex;flex-direction:column;gap:3px}
+.scene-main{font-size:13px;font-weight:700;letter-spacing:.02em}
+.scene-meta{font-family:var(--m);font-size:9px;color:var(--t2);letter-spacing:.05em}
+.size-pill{
+  font-family:var(--m);font-size:9px;font-weight:600;
+  color:var(--orange);background:rgba(255,140,0,.08);
+  border:1px solid rgba(255,140,0,.2);border-radius:6px;padding:3px 8px;letter-spacing:.05em;
+}
+
+.scene-3d{
+  width:100%;aspect-ratio:1/1;max-height:320px;
+  perspective:900px;perspective-origin:50% 45%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  margin:2px 0;
+}
+.scene-3d::before{
+  content:'';position:absolute;width:80%;height:30px;
+  bottom:18%;left:10%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.6) 0%,transparent 65%);
+  filter:blur(8px);pointer-events:none;
+}
+
+.mattress{
+  position:relative;
+  width:210px;height:210px;
+  transform-style:preserve-3d;
+  transition:transform 1.1s cubic-bezier(.65,.05,.25,1);
+}
+.face{
+  position:absolute;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
+}
+/* Top face A */
+.f-top{
+  width:210px;height:210px;
+  transform:translateZ(18px);
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#2a2438 0%,#1a1828 100%);
+  border:1px solid rgba(255,255,255,.08);
+}
+/* Bottom face B */
+.f-bot{
+  width:210px;height:210px;
+  transform:translateZ(-18px) rotateY(180deg);
+  background:
+    linear-gradient(135deg,rgba(255,140,0,.08),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#2d1f1a 0%,#1d1410 100%);
+  border:1px solid rgba(255,140,0,.15);
+}
+/* Sides */
+.f-side{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.3)),
+    linear-gradient(180deg,#15182a,#0a0c18);
+  border:1px solid rgba(255,255,255,.06);
+}
+.f-front{width:210px;height:36px;transform:rotateX(90deg) translateZ(18px) translateY(-9px)}
+.f-back {width:210px;height:36px;transform:rotateX(-90deg) translateZ(192px) translateY(-9px)}
+.f-left {width:36px;height:210px;transform:rotateY(-90deg) translateZ(18px) translateX(-9px)}
+.f-right{width:36px;height:210px;transform:rotateY(90deg) translateZ(192px) translateX(-9px)}
+
+.f-front{left:0;top:0}
+.f-back{left:0;top:0}
+.f-left{left:0;top:0}
+.f-right{left:0;top:0}
+
+/* Face decals */
+.face-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  padding:14px;
+  color:rgba(255,255,255,.75);
+}
+.face-corner{
+  position:absolute;
+  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.15em;
+  color:rgba(255,255,255,.35);
+}
+.face-corner.tl{top:10px;left:12px}
+.face-corner.tr{top:10px;right:12px}
+.face-corner.bl{bottom:10px;left:12px}
+.face-corner.br{bottom:10px;right:12px}
+
+.face-label{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.face-letter{
+  font-family:var(--f);font-size:56px;font-weight:800;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.35));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:.02em;
+}
+.f-bot .face-letter{
+  background:linear-gradient(180deg,rgba(255,180,100,.9),rgba(255,140,0,.35));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.face-sub{
+  font-family:var(--m);font-size:9px;font-weight:600;letter-spacing:.2em;
+  color:rgba(255,255,255,.5);text-transform:uppercase;
+}
+
+/* Quilt pattern overlay */
+.quilt{
+  position:absolute;inset:14px;border-radius:10px;
+  background-image:
+    linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%),
+    linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%);
+  background-size:26px 26px;
+  background-position:0 0,13px 13px;
+  opacity:.8;
+}
+
+/* Head/foot indicators */
+.head-band{
+  position:absolute;left:14px;right:14px;height:16px;
+  background:linear-gradient(90deg,transparent,rgba(79,142,247,.45),transparent);
+  border-top:1px solid rgba(79,142,247,.5);
+  border-bottom:1px solid rgba(79,142,247,.2);
+  top:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.25em;color:rgba(180,210,255,.9);
+}
+.foot-band{
+  position:absolute;left:14px;right:14px;height:16px;
+  background:linear-gradient(90deg,transparent,rgba(124,92,252,.35),transparent);
+  border-top:1px solid rgba(124,92,252,.2);
+  border-bottom:1px solid rgba(124,92,252,.45);
+  bottom:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.25em;color:rgba(200,180,255,.9);
+}
+
+/* State badges under 3D */
+.state-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;
+}
+.state-box{
+  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
+  border-radius:12px;padding:10px 12px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.state-lbl{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t2)}
+.state-val{font-family:var(--m);font-size:16px;font-weight:700;color:var(--t1);line-height:1}
+.state-val .accent-o{color:var(--orange)}
+.state-val .accent-b{color:var(--blue)}
+.state-val .accent-v{color:var(--violet)}
+.state-val .accent-g{color:var(--green)}
+
+/* ══════════════════ RECOMMENDATION CARD ══════════════════ */
+.rec-card{padding:16px;gap:12px}
+.rec-head{display:flex;justify-content:space-between;align-items:center}
+.rec-title{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--t2);text-transform:uppercase}
+.rec-count{
+  font-family:var(--m);font-size:9px;color:var(--t2);
+  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
+  padding:3px 8px;border-radius:6px;
+}
+.rec-hero{
+  display:flex;flex-direction:column;gap:6px;
+  padding:14px 14px 12px;
+  background:linear-gradient(135deg,rgba(255,140,0,.08),rgba(124,92,252,.04));
+  border:1px solid rgba(255,140,0,.18);border-radius:14px;
+}
+.rec-action{font-size:15px;font-weight:700;line-height:1.25}
+.rec-detail{font-family:var(--m);font-size:10px;color:var(--t2);line-height:1.5;letter-spacing:.02em}
+.rec-moves{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap}
+.move-chip{
+  font-family:var(--m);font-size:9px;font-weight:600;
+  padding:4px 9px;border-radius:6px;letter-spacing:.05em;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.mc-rot{color:var(--blue);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2)}
+.mc-flip{color:var(--orange);background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.22)}
+.mc-done{color:var(--green);background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2)}
+
+.btn-confirm{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#ff8c00,#ffb347);
+  border:none;border-radius:14px;
+  font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:#0a0608;cursor:pointer;
+  box-shadow:0 0 24px rgba(255,140,0,.3),inset 0 1px 0 rgba(255,255,255,.4);
+  transition:transform .15s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-confirm:active{transform:scale(.98);box-shadow:0 0 12px rgba(255,140,0,.2),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn-confirm svg{width:16px;height:16px}
+
+.btn-secondary{
+  padding:11px 14px;
+  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
+  border-radius:12px;
+  font-family:var(--f);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--t1);cursor:pointer;
+  transition:background .2s,border-color .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-secondary:active{background:rgba(255,255,255,.06)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ══════════════════ LOG ══════════════════ */
+.log-card{padding:16px;gap:10px}
+.log-head{display:flex;justify-content:space-between;align-items:center}
+.log-title{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--t2);text-transform:uppercase}
+.log-stats{display:flex;gap:6px}
+.log-chip{
+  font-family:var(--m);font-size:9px;font-weight:600;
+  padding:3px 8px;border-radius:6px;letter-spacing:.04em;
+  background:rgba(255,255,255,.03);border:1px solid var(--bdr);color:var(--t1);
+}
+.log-chip .dim{color:var(--t2);margin-left:4px}
+
+.log-list{display:flex;flex-direction:column;gap:4px;max-height:340px;overflow-y:auto}
+.log-row{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.022);border:1px solid transparent;
+  border-radius:10px;padding:9px 11px;
+  transition:background .15s,border-color .15s;
+}
+.log-row:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+.log-num{font-family:var(--m);font-size:9px;color:var(--t3);width:22px;flex-shrink:0;font-weight:600;text-align:right}
+.log-body{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.log-date{font-family:var(--m);font-size:10px;color:var(--t1);font-weight:600;letter-spacing:.02em}
+.log-transition{font-family:var(--m);font-size:9px;color:var(--t2);letter-spacing:.02em}
+.log-arrows{display:flex;gap:4px;flex-shrink:0}
+.log-arr{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--m);font-size:10px;font-weight:700;
+}
+.la-rot{background:rgba(79,142,247,.1);color:var(--blue);border:1px solid rgba(79,142,247,.2)}
+.la-flip{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.22)}
+
+.log-empty{
+  padding:22px 14px;text-align:center;
+  font-family:var(--m);font-size:10px;color:var(--t2);letter-spacing:.05em;
+  background:rgba(255,255,255,.02);border:1px dashed var(--bdr);border-radius:12px;
+}
+
+/* ══════════════════ TOAST ══════════════════ */
+.toast{
+  position:fixed;bottom:calc(20px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(80px);
+  background:rgba(14,16,30,.95);
+  border:1px solid rgba(0,229,160,.3);
+  backdrop-filter:blur(20px);
+  border-radius:12px;padding:12px 18px;
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--m);font-size:11px;font-weight:600;letter-spacing:.04em;
+  color:var(--green);z-index:100;
+  box-shadow:0 10px 40px rgba(0,0,0,.7),0 0 30px rgba(0,229,160,.15);
+  opacity:0;transition:transform .4s cubic-bezier(.2,.8,.3,1),opacity .3s;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast svg{width:14px;height:14px}
+
+/* ══════════════════ MODAL ══════════════════ */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(4,5,11,.75);backdrop-filter:blur(8px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  width:100%;max-width:360px;
+  background:var(--c1);border:1px solid var(--bdr2);
+  border-radius:18px;padding:20px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.modal-title{font-size:14px;font-weight:700;letter-spacing:.05em}
+.modal-text{font-family:var(--m);font-size:11px;color:var(--t2);line-height:1.5}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.btn-danger{
+  padding:11px;background:rgba(255,94,94,.1);border:1px solid rgba(255,94,94,.25);
+  border-radius:11px;color:var(--red);
+  font-family:var(--f);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;
+}
+.btn-danger:active{background:rgba(255,94,94,.16)}
+
+.footer{
+  padding:10px 4px 4px;text-align:center;
+  font-family:var(--m);font-size:8.5px;color:var(--t3);letter-spacing:.15em;
+}
+
+/* Rotation animation helper */
+.mattress.animating{transition:transform 1.1s cubic-bezier(.65,.05,.25,1)}
+</style>
+</head>
+<body>
+
+<div class="bg-scene">
+  <div class="au1"></div>
+  <div class="au2"></div>
+  <div class="au3"></div>
+  <div class="au4"></div>
+</div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <div class="logo-mark">MX</div>
+      <div>
+        <div class="logo-text">Matrax</div>
+        <div class="logo-sub">ROTATION · CONTROL</div>
+      </div>
+    </div>
+    <div class="live-pill">
+      <div class="live-dot"></div>
+      <span id="livePill">ACTIVE</span>
+    </div>
+  </header>
+
+  <!-- 3D SCENE -->
+  <section class="card scene-card ac-o">
+    <div class="scene-head">
+      <div class="scene-title">
+        <div class="scene-main">Текущая ориентация</div>
+        <div class="scene-meta" id="sinceLabel">—</div>
+      </div>
+      <div class="size-pill">200 × 200</div>
+    </div>
+
+    <div class="scene-3d">
+      <div class="mattress" id="mattress">
+        <!-- TOP face A -->
+        <div class="face f-top">
+          <div class="quilt"></div>
+          <div class="head-band">HEAD</div>
+          <div class="foot-band">FOOT</div>
+          <div class="face-corner tl" id="cTL">A1</div>
+          <div class="face-corner tr" id="cTR">A2</div>
+          <div class="face-corner bl" id="cBL">A4</div>
+          <div class="face-corner br" id="cBR">A3</div>
+          <div class="face-label">
+            <div class="face-letter">A</div>
+            <div class="face-sub">Сторона A</div>
+          </div>
+        </div>
+        <!-- BOTTOM face B -->
+        <div class="face f-bot">
+          <div class="quilt"></div>
+          <div class="head-band">HEAD</div>
+          <div class="foot-band">FOOT</div>
+          <div class="face-label">
+            <div class="face-letter">B</div>
+            <div class="face-sub">Сторона B</div>
+          </div>
+        </div>
+        <!-- SIDES -->
+        <div class="face f-side f-front"></div>
+        <div class="face f-side f-back"></div>
+        <div class="face f-side f-left"></div>
+        <div class="face f-side f-right"></div>
+      </div>
+    </div>
+
+    <div class="state-row">
+      <div class="state-box">
+        <div class="state-lbl">Сторона сверху</div>
+        <div class="state-val"><span id="sideBadge" class="accent-o">A</span></div>
+      </div>
+      <div class="state-box">
+        <div class="state-lbl">Угол (ИЗГОЛ.)</div>
+        <div class="state-val"><span id="rotBadge" class="accent-b">0°</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOMMENDATION -->
+  <section class="card rec-card ac-g">
+    <div class="rec-head">
+      <div class="rec-title">Следующая смена</div>
+      <div class="rec-count" id="recCount">ЦИКЛ · 1/4</div>
+    </div>
+    <div class="rec-hero">
+      <div class="rec-action" id="recAction">Повернуть на 90° по часовой</div>
+      <div class="rec-detail" id="recDetail">При смене белья сместите изголовье на правую боковину. Сторону не переворачиваем.</div>
+      <div class="rec-moves" id="recMoves">
+        <span class="move-chip mc-rot">↻ +90°</span>
+      </div>
+    </div>
+
+    <button class="btn-confirm" id="btnConfirm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      Подтвердить смену
+    </button>
+
+    <div class="btn-row">
+      <button class="btn-secondary" id="btnReset">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 10 9 10"/>
+        </svg>
+        Сброс
+      </button>
+      <button class="btn-secondary" id="btnExport">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Экспорт
+      </button>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section class="card log-card ac-b">
+    <div class="log-head">
+      <div class="log-title">Журнал смен</div>
+      <div class="log-stats">
+        <div class="log-chip"><span id="totalCount">0</span><span class="dim">всего</span></div>
+        <div class="log-chip"><span id="daysCount">—</span><span class="dim">дн. назад</span></div>
+      </div>
+    </div>
+    <div class="log-list" id="logList">
+      <div class="log-empty">Журнал пуст. Подтвердите первую смену, чтобы начать отсчёт.</div>
+    </div>
+  </section>
+
+  <div class="footer">MATRAX · v1.0 · ЛОКАЛЬНОЕ ХРАНЕНИЕ</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+  <span id="toastText">Смена зафиксирована</span>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-title">Сбросить все данные?</div>
+    <div class="modal-text">Это удалит текущую ориентацию матраса и весь журнал смен. Действие необратимо.</div>
+    <div class="modal-btns">
+      <button class="btn-secondary" id="btnCancel">Отмена</button>
+      <button class="btn-danger" id="btnConfirmReset">Сбросить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   MATRAX · mattress rotation tracker
+   
+   STATE MODEL
+   ─ state = { side: 'A'|'B', rot: 0|90|180|270 }
+   ─ side: какая сторона сейчас сверху
+   ─ rot:  угол поворота матраса по часовой (вокруг вертикальной оси)
+            0° = изголовье на "север" (как было изначально)
+   
+   RECOMMENDED CYCLE (каждая смена белья):
+   ─ Чередуем: только поворот +90° / только flip (сторона)
+   ─ Полный цикл за 4 шага возвращает матрас в исходное состояние,
+     при этом все 4 угла и обе стороны получают равномерный износ.
+   
+   STEP 0 → 1: rotate +90°   (A, 0°)   → (A, 90°)
+   STEP 1 → 2: flip          (A, 90°)  → (B, 90°)   [с доп. поворотом см. ниже]
+   STEP 2 → 3: rotate +90°   (B, 90°)  → (B, 180°)
+   STEP 3 → 0: flip          (B, 180°) → (A, 0°)
+   
+   Такой паттерн — комбинация "head-to-foot flip" и "side-to-side rotation",
+   рекомендуемая большинством производителей матрасов для равномерного износа.
+═══════════════════════════════════════════════════════════ */
+
+const STORAGE_KEY = 'matrax_state_v1';
+const LOG_KEY = 'matrax_log_v1';
+
+const CYCLE = [
+  { side:'A', rot:0   },
+  { side:'A', rot:90  },
+  { side:'B', rot:90  },
+  { side:'B', rot:180 },
+];
+
+const STEP_TEXT = [
+  // index = current step (0..3), описывает переход step → (step+1)%4
+  {
+    action: 'Повернуть на 90° по часовой',
+    detail: 'При смене белья сместите изголовье на правую боковину. Сторону не переворачиваем.',
+    chips: ['rot'],
+  },
+  {
+    action: 'Перевернуть на другую сторону',
+    detail: 'Переверните матрас через длинную сторону — теперь сверху сторона B. Изголовье остаётся там же.',
+    chips: ['flip'],
+  },
+  {
+    action: 'Повернуть на 90° по часовой',
+    detail: 'Сместите изголовье на правую боковину. Сторону не меняем — сейчас сверху B.',
+    chips: ['rot'],
+  },
+  {
+    action: 'Перевернуть на сторону A',
+    detail: 'Переверните матрас — возвращаемся к стороне A, полный цикл завершён.',
+    chips: ['flip'],
+  },
+];
+
+/* ─────────────── STATE ─────────────── */
+let state = loadState();
+let log = loadLog();
+let animLock = false;
+// visual rotation accumulator to avoid reverse-spin
+let visualRotY = 0;
+let visualRotZ = 0;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { step:0, lastChange:null };
+    const p = JSON.parse(raw);
+    if(typeof p.step !== 'number') return { step:0, lastChange:null };
+    return p;
+  }catch(e){ return { step:0, lastChange:null }; }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadLog(){
+  try{
+    const raw = localStorage.getItem(LOG_KEY);
+    if(!raw) return [];
+    const p = JSON.parse(raw);
+    return Array.isArray(p) ? p : [];
+  }catch(e){ return []; }
+}
+function saveLog(){
+  try{ localStorage.setItem(LOG_KEY, JSON.stringify(log)); }catch(e){}
+}
+
+/* ─────────────── DOM ─────────────── */
+const $ = (s) => document.querySelector(s);
+const mattress = $('#mattress');
+const sideBadge = $('#sideBadge');
+const rotBadge = $('#rotBadge');
+const sinceLabel = $('#sinceLabel');
+const recAction = $('#recAction');
+const recDetail = $('#recDetail');
+const recMoves = $('#recMoves');
+const recCount = $('#recCount');
+const logList = $('#logList');
+const totalCount = $('#totalCount');
+const daysCount = $('#daysCount');
+const toast = $('#toast');
+const toastText = $('#toastText');
+const modal = $('#modal');
+
+/* ─────────────── FORMATTING ─────────────── */
+function pad2(n){ return n<10?'0'+n:''+n; }
+function fmtDate(ts){
+  const d = new Date(ts);
+  return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'+d.getFullYear()+
+         ' · '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+}
+function fmtSince(ts){
+  if(!ts) return 'Без смен · установите стартовую позицию';
+  const diff = Date.now() - ts;
+  const sec = Math.floor(diff/1000);
+  const min = Math.floor(sec/60);
+  const hr = Math.floor(min/60);
+  const day = Math.floor(hr/24);
+  if(day >= 1) return 'Последняя смена · '+day+' '+plural(day,['день','дня','дней'])+' назад';
+  if(hr >= 1) return 'Последняя смена · '+hr+' '+plural(hr,['час','часа','часов'])+' назад';
+  if(min >= 1) return 'Последняя смена · '+min+' мин. назад';
+  return 'Последняя смена · только что';
+}
+function plural(n, forms){
+  const n10 = n%10, n100 = n%100;
+  if(n10===1 && n100!==11) return forms[0];
+  if(n10>=2 && n10<=4 && (n100<10 || n100>=20)) return forms[1];
+  return forms[2];
+}
+
+/* ─────────────── RENDER 3D ─────────────── */
+function render3D(animated){
+  const current = CYCLE[state.step];
+  // compute target visual angles, tracking accumulators for continuous motion
+  const targetRotY = (current.side === 'B') ? 180 : 0;
+  const targetRotZ = current.rot; // visual "around vertical" when viewed top-down maps to Z in our 3D box
+
+  // Choose shortest rotation delta and add to accumulator
+  const deltaY = shortestDelta(visualRotY % 360, targetRotY);
+  const deltaZ = shortestDelta(visualRotZ % 360, targetRotZ);
+  visualRotY += deltaY;
+  visualRotZ += deltaZ;
+
+  mattress.style.transition = animated ? 'transform 1.1s cubic-bezier(.65,.05,.25,1)' : 'transform 0s';
+  // Slight X tilt so we see the top face nicely; Y for flip; Z for rotation on bed
+  mattress.style.transform = 'rotateX(-22deg) rotateY('+visualRotY+'deg) rotateZ('+visualRotZ+'deg)';
+}
+function shortestDelta(from, to){
+  let d = ((to - from) % 360 + 540) % 360 - 180;
+  return d;
+}
+
+/* ─────────────── RENDER UI ─────────────── */
+function render(animated){
+  const current = CYCLE[state.step];
+  const next = (state.step + 1) % 4;
+  const rec = STEP_TEXT[state.step];
+
+  // side & rot badges
+  sideBadge.textContent = current.side;
+  sideBadge.className = current.side === 'A' ? 'accent-o' : 'accent-v';
+  rotBadge.textContent = current.rot + '°';
+  rotBadge.className = 'accent-b';
+
+  // since
+  sinceLabel.textContent = fmtSince(state.lastChange);
+
+  // recommendation
+  recAction.textContent = rec.action;
+  recDetail.textContent = rec.detail;
+  recCount.textContent = 'ШАГ · ' + (state.step+1) + '/4';
+  recMoves.innerHTML = rec.chips.map(c => {
+    if(c === 'rot') return '<span class="move-chip mc-rot">↻ +90° поворот</span>';
+    if(c === 'flip') return '<span class="move-chip mc-flip">⇅ flip сторона</span>';
+    return '';
+  }).join('');
+
+  // 3D
+  render3D(animated);
+
+  // log
+  renderLog();
+}
+
+function renderLog(){
+  totalCount.textContent = log.length;
+  if(log.length === 0){
+    daysCount.textContent = '—';
+    logList.innerHTML = '<div class="log-empty">Журнал пуст. Подтвердите первую смену, чтобы начать отсчёт.</div>';
+    return;
+  }
+  const last = log[log.length-1];
+  const daysSince = Math.floor((Date.now() - last.ts) / (1000*60*60*24));
+  daysCount.textContent = daysSince;
+
+  // reverse chronological
+  const rows = [];
+  for(let i = log.length-1; i >= 0; i--){
+    const e = log[i];
+    const from = e.from;
+    const to = e.to;
+    const arrows = [];
+    if(e.rotated) arrows.push('<div class="log-arr la-rot" title="Поворот +90°">↻</div>');
+    if(e.flipped) arrows.push('<div class="log-arr la-flip" title="Flip">⇅</div>');
+    rows.push(
+      '<div class="log-row">'+
+        '<div class="log-num">'+(i+1).toString().padStart(2,'0')+'</div>'+
+        '<div class="log-body">'+
+          '<div class="log-date">'+fmtDate(e.ts)+'</div>'+
+          '<div class="log-transition">'+from.side+'·'+from.rot+'° → '+to.side+'·'+to.rot+'°</div>'+
+        '</div>'+
+        '<div class="log-arrows">'+arrows.join('')+'</div>'+
+      '</div>'
+    );
+  }
+  logList.innerHTML = rows.join('');
+}
+
+/* ─────────────── ACTIONS ─────────────── */
+function confirmChange(){
+  if(animLock) return;
+  animLock = true;
+
+  const from = {...CYCLE[state.step]};
+  const nextStep = (state.step + 1) % 4;
+  const to = {...CYCLE[nextStep]};
+  const rotated = from.rot !== to.rot;
+  const flipped = from.side !== to.side;
+
+  const entry = {
+    ts: Date.now(),
+    from, to, rotated, flipped,
+    step: nextStep,
+  };
+  log.push(entry);
+  state.step = nextStep;
+  state.lastChange = entry.ts;
+  saveState();
+  saveLog();
+
+  render(true);
+  showToast('Смена зафиксирована · ' + fmtDate(entry.ts).split(' · ')[1]);
+
+  // haptic
+  if(navigator.vibrate) navigator.vibrate(15);
+
+  setTimeout(()=>{ animLock = false; }, 1150);
+}
+
+function resetAll(){
+  state = { step:0, lastChange:null };
+  log = [];
+  visualRotY = 0;
+  visualRotZ = 0;
+  saveState();
+  saveLog();
+  render(true);
+  showToast('Сброшено · исходная позиция');
+}
+
+function exportLog(){
+  const data = {
+    exportedAt: new Date().toISOString(),
+    state: state,
+    currentPosition: CYCLE[state.step],
+    log: log.map(e => ({
+      timestamp: new Date(e.ts).toISOString(),
+      timestampLocal: fmtDate(e.ts),
+      from: e.from,
+      to: e.to,
+      rotated: e.rotated,
+      flipped: e.flipped,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'matrax-log-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Экспортировано · '+log.length+' записей');
+}
+
+/* ─────────────── TOAST ─────────────── */
+let toastTimer = null;
+function showToast(msg){
+  toastText.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove('show'), 2400);
+}
+
+/* ─────────────── MODAL ─────────────── */
+function openModal(){ modal.classList.add('show'); }
+function closeModal(){ modal.classList.remove('show'); }
+
+/* ─────────────── EVENTS ─────────────── */
+$('#btnConfirm').addEventListener('click', confirmChange);
+$('#btnReset').addEventListener('click', openModal);
+$('#btnCancel').addEventListener('click', closeModal);
+$('#btnConfirmReset').addEventListener('click', ()=>{ resetAll(); closeModal(); });
+$('#btnExport').addEventListener('click', exportLog);
+modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+// update "since" label every 30s
+setInterval(()=>{ sinceLabel.textContent = fmtSince(state.lastChange); }, 30000);
+
+/* ─────────────── INIT ─────────────── */
+// Set visual accumulator to match saved state on first paint (no animation)
+const initial = CYCLE[state.step];
+visualRotY = initial.side === 'B' ? 180 : 0;
+visualRotZ = initial.rot;
+render(false);
+
+// Service worker for PWA / offline
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+
+</body>
+</html>

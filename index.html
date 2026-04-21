@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#04050b">
+<meta name="theme-color" content="#04050b" id="themeColorMeta">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,39 +15,80 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
+
+/* ══════════════════ THEMES ══════════════════ */
+[data-theme="dark"]{
   --bg:#04050b;
   --c1:rgba(14,16,30,0.85);
-  --c2:rgba(20,23,42,0.6);
   --bdr:rgba(255,255,255,0.055);
   --bdr2:rgba(255,255,255,0.12);
   --blue:#4f8ef7;
   --violet:#7c5cfc;
   --green:#00e5a0;
   --red:#ff5e5e;
-  --yellow:#ffc145;
   --orange:#ff8c00;
   --t1:#e2eaf8;
   --t2:#4e5a78;
   --t3:#1e2540;
+  --mattress-a:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),linear-gradient(180deg,#2a2438 0%,#1a1828 100%);
+  --mattress-b:linear-gradient(135deg,rgba(255,140,0,.08),rgba(255,255,255,0) 60%),linear-gradient(180deg,#2d1f1a 0%,#1d1410 100%);
+  --mattress-side:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.3)),linear-gradient(180deg,#15182a,#0a0c18);
+  --scene-shadow:rgba(0,0,0,.6);
+  --stat-bg:rgba(255,255,255,.03);
+  --quilt:rgba(255,255,255,.04);
+  --compass-bg:rgba(4,5,11,.55);
+  --letter-grad:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.35));
+  --letter-b-grad:linear-gradient(180deg,rgba(255,180,100,.9),rgba(255,140,0,.35));
+  --tabbar-bg:rgba(8,10,20,0.88);
+}
+[data-theme="light"]{
+  --bg:#f0ead9;
+  --c1:rgba(255,253,245,0.85);
+  --bdr:rgba(60,45,25,0.1);
+  --bdr2:rgba(60,45,25,0.2);
+  --blue:#1e5bc9;
+  --violet:#5a2fd9;
+  --green:#058f5f;
+  --red:#c73030;
+  --orange:#b84a00;
+  --t1:#2a1f12;
+  --t2:#8a7a60;
+  --t3:#c9bca0;
+  --mattress-a:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,0) 60%),linear-gradient(180deg,#e8dcc0 0%,#c9b790 100%);
+  --mattress-b:linear-gradient(135deg,rgba(184,74,0,.12),rgba(255,255,255,0) 60%),linear-gradient(180deg,#f0cc8a 0%,#d9a65a 100%);
+  --mattress-side:linear-gradient(180deg,rgba(255,255,255,.5),rgba(0,0,0,.1)),linear-gradient(180deg,#c9b790,#9e8555);
+  --scene-shadow:rgba(80,55,25,.4);
+  --stat-bg:rgba(255,253,245,0.55);
+  --quilt:rgba(60,45,25,.06);
+  --compass-bg:rgba(255,253,245,0.75);
+  --letter-grad:linear-gradient(180deg,rgba(42,31,18,.85),rgba(42,31,18,.4));
+  --letter-b-grad:linear-gradient(180deg,rgba(130,55,0,.95),rgba(184,74,0,.5));
+  --tabbar-bg:rgba(250,245,230,0.9);
+}
+
+:root{
   --f:'Syne',sans-serif;
   --m:'JetBrains Mono',monospace;
   --safe-t:env(safe-area-inset-top,0px);
   --safe-b:env(safe-area-inset-bottom,0px);
+  --tabbar-h:62px;
 }
+
 html,body{
   width:100%;min-height:100vh;min-height:100dvh;
   background:var(--bg);color:var(--t1);font-family:var(--f);
-  overflow-x:hidden;overscroll-behavior:none;
+  overflow-x:hidden;overscroll-behavior-y:contain;
+  transition:background .35s,color .35s;
 }
 body{
-  padding-top:var(--safe-t);padding-bottom:var(--safe-b);
+  padding-top:var(--safe-t);
   user-select:none;-webkit-user-select:none;
 }
 ::-webkit-scrollbar{width:0;height:0}
 
 /* ══════════════════ BACKGROUND ══════════════════ */
-.bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;transition:opacity .4s}
+[data-theme="light"] .bg-scene{opacity:.35}
 .bg-scene::before{
   content:'';position:absolute;inset:0;
   background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
@@ -55,40 +96,39 @@ body{
   mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,black 20%,transparent 80%);
   -webkit-mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,black 20%,transparent 80%);
 }
+[data-theme="light"] .bg-scene::before{background-image:radial-gradient(circle,rgba(60,45,25,.08) 1px,transparent 1px)}
 .au1{position:absolute;top:-180px;right:-120px;width:520px;height:420px;border-radius:50%;
-  background:conic-gradient(from 185deg at 58% 22%,
-    #c8300099 0deg,#ff6b2b88 30deg,#ff8c0066 65deg,
-    #ffb34744 95deg,#ff4e0022 130deg,#7c5cfc11 185deg,transparent 250deg);
-  filter:blur(70px);
-  animation:auA 16s ease-in-out infinite alternate}
+  background:conic-gradient(from 185deg at 58% 22%,#c8300099 0deg,#ff6b2b88 30deg,#ff8c0066 65deg,#ffb34744 95deg,#ff4e0022 130deg,#7c5cfc11 185deg,transparent 250deg);
+  filter:blur(70px);animation:auA 16s ease-in-out infinite alternate}
 .au2{position:absolute;top:-100px;right:0;width:320px;height:240px;border-radius:50%;
   background:radial-gradient(ellipse,rgba(240,90,20,.22) 0%,transparent 68%);
-  filter:blur(40px);
-  animation:auB 10s ease-in-out infinite alternate-reverse}
+  filter:blur(40px);animation:auB 10s ease-in-out infinite alternate-reverse}
 .au3{position:absolute;top:40%;left:-100px;width:340px;height:260px;border-radius:50%;
   background:radial-gradient(ellipse,rgba(79,142,247,.08) 0%,transparent 70%);
-  filter:blur(50px);
-  animation:auB 18s ease-in-out infinite alternate}
+  filter:blur(50px);animation:auB 18s ease-in-out infinite alternate}
 .au4{position:absolute;bottom:-60px;right:-40px;width:380px;height:240px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(124,92,252,.07) 0%,transparent 70%);
-  filter:blur(60px)}
+  background:radial-gradient(ellipse,rgba(124,92,252,.07) 0%,transparent 70%);filter:blur(60px)}
 @keyframes auA{from{transform:translate(0,0) scale(1);opacity:.9}to{transform:translate(-40px,20px) scale(1.1);opacity:.6}}
 @keyframes auB{from{transform:translate(0,0)}to{transform:translate(20px,-15px) scale(1.08)}}
 
-/* ══════════════════ LAYOUT ══════════════════ */
+/* ══════════════════ APP LAYOUT ══════════════════ */
 .app{
   position:relative;z-index:2;
   width:100%;max-width:480px;margin:0 auto;
-  display:flex;flex-direction:column;
-  padding:14px 14px 20px;gap:12px;
+  padding:0 14px calc(var(--tabbar-h) + var(--safe-b) + 16px);
   min-height:100dvh;
 }
 
 /* ══════════════════ HEADER ══════════════════ */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 2px 2px}
-.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 2px 12px;gap:10px;
+  position:sticky;top:var(--safe-t);z-index:10;
+  background:linear-gradient(180deg,var(--bg) 60%,transparent);
+}
+.hdr-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .logo-mark{
-  width:32px;height:32px;border-radius:8px;
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
   background:linear-gradient(135deg,#ff8c00,#ffb347);
   display:flex;align-items:center;justify-content:center;
   font-family:var(--m);font-size:11px;font-weight:700;color:#000;
@@ -96,19 +136,35 @@ body{
 }
 .logo-text{
   font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.6) 100%);
+  background:linear-gradient(90deg,var(--t1) 0%,var(--t2) 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .logo-sub{font-size:8.5px;color:var(--t2);font-weight:500;letter-spacing:.1em;margin-top:1px;font-family:var(--m)}
-.live-pill{
-  display:flex;align-items:center;gap:5px;
-  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);
-  border-radius:20px;padding:4px 10px;
-  font-family:var(--m);font-size:8.5px;font-weight:600;letter-spacing:.1em;color:var(--green);
+
+/* Theme toggle */
+.theme-toggle{
+  display:flex;align-items:center;position:relative;flex-shrink:0;
+  background:var(--stat-bg);border:1px solid var(--bdr);
+  border-radius:24px;padding:3px;
+  transition:background .35s,border-color .35s;
 }
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 8px var(--green);animation:blink 2s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3;transform:scale(.7)}}
+.theme-btn{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t2);cursor:pointer;background:transparent;border:none;
+  position:relative;z-index:2;transition:color .35s;
+}
+.theme-btn.active{color:#0a0608}
+.theme-btn svg{width:14px;height:14px;stroke-width:2.2}
+.theme-slider{
+  position:absolute;top:3px;left:3px;
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),#ffb347);
+  box-shadow:0 0 14px rgba(255,140,0,.45),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .35s cubic-bezier(.5,.05,.3,1);
+  z-index:1;
+}
+[data-theme="light"] .theme-slider{transform:translateX(28px)}
 
 /* ══════════════════ CARD ══════════════════ */
 .card{
@@ -117,134 +173,171 @@ body{
   border-radius:18px;
   backdrop-filter:blur(24px) saturate(1.4);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);
-  display:flex;flex-direction:column;
-  overflow:hidden;position:relative;
+  position:relative;
+  transition:background .35s,border-color .35s;
 }
 .card::before{
   content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
   pointer-events:none;
 }
+[data-theme="light"] .card::before{background:linear-gradient(90deg,transparent,rgba(60,45,25,.18),transparent)}
 .card::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 60%);
   pointer-events:none;border-radius:18px;
 }
 .card>*{position:relative;z-index:1}
-.clbl{font-size:8.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t2)}
+.ac-o::before{background:linear-gradient(90deg,transparent,rgba(255,140,0,.55),transparent)!important}
+.ac-b::before{background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)!important}
+.ac-g::before{background:linear-gradient(90deg,transparent,rgba(0,229,160,.5),transparent)!important}
 
-.ac-o::before{background:linear-gradient(90deg,transparent,rgba(255,140,0,.55),transparent)}
-.ac-b::before{background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)}
-.ac-g::before{background:linear-gradient(90deg,transparent,rgba(0,229,160,.5),transparent)}
-.ac-v::before{background:linear-gradient(90deg,transparent,rgba(124,92,252,.5),transparent)}
+/* ══════════════════ TABS (views) ══════════════════ */
+.view{display:none;flex-direction:column;gap:12px;animation:fadeIn .25s ease-out}
+.view.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══════════════════ 3D MATTRESS SCENE ══════════════════ */
-.scene-card{padding:16px 16px 14px;gap:6px}
-.scene-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
-.scene-title{display:flex;flex-direction:column;gap:3px}
+/* ══════════════════ TABBAR ══════════════════ */
+.tabbar{
+  position:fixed;
+  left:0;right:0;bottom:0;z-index:20;
+  padding-bottom:var(--safe-b);
+  background:var(--tabbar-bg);
+  backdrop-filter:blur(22px) saturate(1.4);
+  -webkit-backdrop-filter:blur(22px) saturate(1.4);
+  border-top:1px solid var(--bdr);
+  transition:background .35s,border-color .35s;
+}
+.tabbar-inner{
+  max-width:480px;margin:0 auto;
+  height:var(--tabbar-h);
+  display:grid;grid-template-columns:repeat(3,1fr);
+}
+.tab-btn{
+  background:none;border:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--t2);font-family:var(--f);
+  position:relative;
+  transition:color .2s;
+  padding:6px 4px;
+}
+.tab-btn svg{width:22px;height:22px;stroke-width:2;transition:transform .2s}
+.tab-btn:active svg{transform:scale(.9)}
+.tab-label{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.tab-btn.active{color:var(--orange)}
+.tab-btn.active::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:28px;height:2px;border-radius:0 0 2px 2px;
+  background:linear-gradient(90deg,transparent,var(--orange),transparent);
+  box-shadow:0 0 8px var(--orange);
+}
+.tab-badge{
+  position:absolute;top:8px;right:calc(50% - 20px);
+  min-width:15px;height:15px;padding:0 4px;
+  border-radius:8px;background:var(--orange);
+  color:#000;font-family:var(--m);font-size:8.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--bg);
+  transition:background .35s;
+}
+.tab-badge.hidden{display:none}
+
+/* ══════════════════ MATTRESS PICKER ══════════════════ */
+.picker{padding:12px 14px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.picker-lbl{font-size:9px;font-weight:700;letter-spacing:.2em;color:var(--t2);text-transform:uppercase}
+.picker-tabs{
+  display:flex;gap:3px;background:var(--stat-bg);
+  border:1px solid var(--bdr);border-radius:12px;padding:3px;
+  transition:background .35s,border-color .35s;
+}
+.picker-tab{
+  font-family:var(--f);font-size:10.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 11px;border-radius:9px;cursor:pointer;
+  color:var(--t2);background:transparent;border:none;
+  transition:color .2s,background .2s;
+}
+.picker-tab.active{
+  color:#0a0608;
+  background:linear-gradient(135deg,var(--orange),#ffb347);
+  box-shadow:0 0 14px rgba(255,140,0,.35),inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+/* ══════════════════ 3D SCENE ══════════════════ */
+.scene-card{padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px}
+.scene-head{display:flex;justify-content:space-between;align-items:flex-start}
+.scene-title{display:flex;flex-direction:column;gap:3px;min-width:0}
 .scene-main{font-size:13px;font-weight:700;letter-spacing:.02em}
 .scene-meta{font-family:var(--m);font-size:9px;color:var(--t2);letter-spacing:.05em}
 .size-pill{
   font-family:var(--m);font-size:9px;font-weight:600;
   color:var(--orange);background:rgba(255,140,0,.08);
-  border:1px solid rgba(255,140,0,.2);border-radius:6px;padding:3px 8px;letter-spacing:.05em;
+  border:1px solid rgba(255,140,0,.22);border-radius:6px;padding:3px 8px;letter-spacing:.05em;
+  flex-shrink:0;
 }
 
 .scene-3d{
-  width:100%;aspect-ratio:1/1;max-height:320px;
+  width:100%;height:290px;
   perspective:900px;perspective-origin:50% 45%;
   display:flex;align-items:center;justify-content:center;
   position:relative;
-  margin:2px 0;
+  touch-action:none;
 }
-.scene-3d::before{
-  content:'';position:absolute;width:80%;height:30px;
-  bottom:18%;left:10%;
-  background:radial-gradient(ellipse,rgba(0,0,0,.6) 0%,transparent 65%);
+.scene-3d::after{
+  content:'';position:absolute;width:75%;height:24px;
+  bottom:16%;left:12.5%;
+  background:radial-gradient(ellipse,var(--scene-shadow) 0%,transparent 65%);
   filter:blur(8px);pointer-events:none;
 }
 
-/* Compass direction labels around the scene */
-.compass{
-  position:absolute;inset:0;pointer-events:none;z-index:5;
-}
+/* Compass labels */
+.compass{position:absolute;inset:0;pointer-events:none;z-index:5}
 .cp{
   position:absolute;
   font-family:var(--m);font-size:10px;font-weight:700;letter-spacing:.2em;
   color:var(--t2);
   padding:3px 7px;border-radius:5px;
-  background:rgba(4,5,11,.55);border:1px solid var(--bdr);
+  background:var(--compass-bg);border:1px solid var(--bdr);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background .35s,border-color .35s,color .35s;
 }
-.cp-n{top:10px;left:50%;transform:translateX(-50%);color:var(--blue);border-color:rgba(79,142,247,.3)}
-.cp-s{bottom:10px;left:50%;transform:translateX(-50%)}
-.cp-w{left:10px;top:50%;transform:translateY(-50%)}
-.cp-e{right:10px;top:50%;transform:translateY(-50%)}
+.cp-n{top:6px;left:50%;transform:translateX(-50%);color:var(--blue);border-color:rgba(79,142,247,.3)}
+.cp-s{bottom:6px;left:50%;transform:translateX(-50%)}
+.cp-w{left:6px;top:50%;transform:translateY(-50%)}
+.cp-e{right:6px;top:50%;transform:translateY(-50%)}
 
+.swipe-hint{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--m);font-size:9px;letter-spacing:.15em;
+  color:var(--t2);opacity:.45;text-transform:uppercase;
+  pointer-events:none;z-index:6;
+  padding:5px 10px;border-radius:6px;
+  background:var(--compass-bg);border:1px solid var(--bdr);
+  animation:hintPulse 3.5s ease-in-out infinite;
+  transition:opacity .3s;
+}
+.scene-3d.touched .swipe-hint{opacity:0;animation:none}
+@keyframes hintPulse{0%,100%{opacity:.3}50%{opacity:.6}}
+
+/* The mattress (3D box) */
 .mattress{
   position:relative;
-  width:210px;height:210px;
   transform-style:preserve-3d;
   transition:transform 1.1s cubic-bezier(.65,.05,.25,1);
+  will-change:transform;
 }
+.mattress.dragging{transition:none !important}
+
 .face{
   position:absolute;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  border-radius:14px;
-  overflow:hidden;
+  border-radius:14px;overflow:hidden;
   box-shadow:0 0 0 1px rgba(255,255,255,.08) inset;
+  left:0;top:0;
 }
-/* Top face A */
-.f-top{
-  width:210px;height:210px;
-  transform:translateZ(18px);
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),
-    linear-gradient(180deg,#2a2438 0%,#1a1828 100%);
-  border:1px solid rgba(255,255,255,.08);
-}
-/* Bottom face B */
-.f-bot{
-  width:210px;height:210px;
-  transform:translateZ(-18px) rotateY(180deg);
-  background:
-    linear-gradient(135deg,rgba(255,140,0,.08),rgba(255,255,255,0) 60%),
-    linear-gradient(180deg,#2d1f1a 0%,#1d1410 100%);
-  border:1px solid rgba(255,140,0,.15);
-}
-/* Sides */
-.f-side{
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.3)),
-    linear-gradient(180deg,#15182a,#0a0c18);
-  border:1px solid rgba(255,255,255,.06);
-}
-.f-front{width:210px;height:36px;transform:rotateX(90deg) translateZ(18px) translateY(-9px)}
-.f-back {width:210px;height:36px;transform:rotateX(-90deg) translateZ(192px) translateY(-9px)}
-.f-left {width:36px;height:210px;transform:rotateY(-90deg) translateZ(18px) translateX(-9px)}
-.f-right{width:36px;height:210px;transform:rotateY(90deg) translateZ(192px) translateX(-9px)}
-
-.f-front{left:0;top:0}
-.f-back{left:0;top:0}
-.f-left{left:0;top:0}
-.f-right{left:0;top:0}
-
-/* Face decals */
-.face-inner{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  padding:14px;
-  color:rgba(255,255,255,.75);
-}
-.face-corner{
-  position:absolute;
-  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.15em;
-  color:rgba(255,255,255,.35);
-}
-.face-corner.tl{top:10px;left:12px}
-.face-corner.tr{top:10px;right:12px}
-.face-corner.bl{bottom:10px;left:12px}
-.face-corner.br{bottom:10px;right:12px}
+.f-top{background:var(--mattress-a);border:1px solid rgba(255,255,255,.08)}
+.f-bot{background:var(--mattress-b);border:1px solid rgba(255,140,0,.15)}
+.f-side{background:var(--mattress-side);border:1px solid rgba(255,255,255,.06)}
 
 .face-label{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -252,92 +345,85 @@ body{
 }
 .face-letter{
   font-family:var(--f);font-size:56px;font-weight:800;line-height:1;
-  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.35));
+  background:var(--letter-grad);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   letter-spacing:.02em;
 }
-.f-bot .face-letter{
-  background:linear-gradient(180deg,rgba(255,180,100,.9),rgba(255,140,0,.35));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
+.f-bot .face-letter{background:var(--letter-b-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .face-sub{
   font-family:var(--m);font-size:9px;font-weight:600;letter-spacing:.2em;
-  color:rgba(255,255,255,.5);text-transform:uppercase;
+  color:var(--t2);text-transform:uppercase;
 }
 
-/* Quilt pattern overlay */
 .quilt{
   position:absolute;inset:14px;border-radius:10px;
   background-image:
-    linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%),
-    linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%);
-  background-size:26px 26px;
-  background-position:0 0,13px 13px;
-  opacity:.8;
+    linear-gradient(45deg,var(--quilt) 25%,transparent 25%,transparent 75%,var(--quilt) 75%),
+    linear-gradient(45deg,var(--quilt) 25%,transparent 25%,transparent 75%,var(--quilt) 75%);
+  background-size:26px 26px;background-position:0 0,13px 13px;opacity:.85;
 }
 
-/* Head/foot indicators */
-.head-band{
+.head-band,.foot-band{
   position:absolute;left:14px;right:14px;height:16px;
-  background:linear-gradient(90deg,transparent,rgba(79,142,247,.45),transparent);
-  border-top:1px solid rgba(79,142,247,.5);
-  border-bottom:1px solid rgba(79,142,247,.2);
-  top:14px;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.25em;color:rgba(180,210,255,.9);
+  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.25em;
+}
+.head-band{
+  background:linear-gradient(90deg,transparent,rgba(79,142,247,.45),transparent);
+  border-top:1px solid rgba(79,142,247,.5);border-bottom:1px solid rgba(79,142,247,.2);
+  top:14px;color:rgba(180,210,255,.95);
 }
 .foot-band{
-  position:absolute;left:14px;right:14px;height:16px;
   background:linear-gradient(90deg,transparent,rgba(124,92,252,.35),transparent);
-  border-top:1px solid rgba(124,92,252,.2);
-  border-bottom:1px solid rgba(124,92,252,.45);
-  bottom:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--m);font-size:8px;font-weight:700;letter-spacing:.25em;color:rgba(200,180,255,.9);
+  border-top:1px solid rgba(124,92,252,.2);border-bottom:1px solid rgba(124,92,252,.45);
+  bottom:14px;color:rgba(200,180,255,.95);
 }
+[data-theme="light"] .head-band{color:rgba(10,50,160,.95)}
+[data-theme="light"] .foot-band{color:rgba(70,30,180,.95)}
 
-/* State badges under 3D */
-.state-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;
-}
+/* State summary below 3D */
+.state-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .state-box{
-  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
+  background:var(--stat-bg);border:1px solid var(--bdr);
   border-radius:12px;padding:10px 12px;
   display:flex;flex-direction:column;gap:4px;
+  transition:background .35s,border-color .35s;
 }
 .state-lbl{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t2)}
-.state-val{font-family:var(--m);font-size:16px;font-weight:700;color:var(--t1);line-height:1}
-.state-val .accent-o{color:var(--orange)}
-.state-val .accent-b{color:var(--blue)}
-.state-val .accent-v{color:var(--violet)}
-.state-val .accent-g{color:var(--green)}
+.state-val{font-family:var(--m);font-size:15px;font-weight:700;color:var(--t1);line-height:1}
+.accent-o{color:var(--orange)}
+.accent-b{color:var(--blue)}
+.accent-v{color:var(--violet)}
+.accent-g{color:var(--green)}
 
-/* ══════════════════ RECOMMENDATION CARD ══════════════════ */
-.rec-card{padding:16px;gap:12px}
-.rec-head{display:flex;justify-content:space-between;align-items:center}
+/* ══════════════════ RECOMMENDATION ══════════════════ */
+.rec-card{padding:16px;display:flex;flex-direction:column;gap:12px}
+.rec-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .rec-title{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--t2);text-transform:uppercase}
 .rec-count{
   font-family:var(--m);font-size:9px;color:var(--t2);
-  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
-  padding:3px 8px;border-radius:6px;
+  background:var(--stat-bg);border:1px solid var(--bdr);
+  padding:3px 8px;border-radius:6px;white-space:nowrap;
+  transition:background .35s,border-color .35s;
 }
 .rec-hero{
-  display:flex;flex-direction:column;gap:6px;
-  padding:14px 14px 12px;
+  display:flex;flex-direction:column;gap:8px;
+  padding:14px;
   background:linear-gradient(135deg,rgba(255,140,0,.08),rgba(124,92,252,.04));
   border:1px solid rgba(255,140,0,.18);border-radius:14px;
 }
-.rec-action{font-size:15px;font-weight:700;line-height:1.25}
-.rec-detail{font-family:var(--m);font-size:10px;color:var(--t2);line-height:1.5;letter-spacing:.02em}
+[data-theme="light"] .rec-hero{background:linear-gradient(135deg,rgba(184,74,0,.08),rgba(90,47,217,.04));border-color:rgba(184,74,0,.2)}
+.rec-action{font-size:15px;font-weight:700;line-height:1.3}
+.rec-detail{font-family:var(--m);font-size:10.5px;color:var(--t2);line-height:1.55;letter-spacing:.01em}
 .rec-moves{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap}
 .move-chip{
-  font-family:var(--m);font-size:9px;font-weight:600;
-  padding:4px 9px;border-radius:6px;letter-spacing:.05em;
+  font-family:var(--m);font-size:9.5px;font-weight:600;
+  padding:5px 10px;border-radius:6px;letter-spacing:.05em;
   display:inline-flex;align-items:center;gap:5px;
 }
-.mc-rot{color:var(--blue);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2)}
-.mc-flip{color:var(--orange);background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.22)}
-.mc-done{color:var(--green);background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2)}
+.mc-rot{color:var(--blue);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.22)}
+.mc-flip{color:var(--orange);background:rgba(255,140,0,.1);border:1px solid rgba(255,140,0,.24)}
+.mc-turn{color:var(--violet);background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.24)}
 
 .btn-confirm{
   width:100%;padding:14px;
@@ -350,81 +436,85 @@ body{
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn-confirm:active{transform:scale(.98);box-shadow:0 0 12px rgba(255,140,0,.2),inset 0 1px 0 rgba(255,255,255,.4)}
-.btn-confirm svg{width:16px;height:16px}
+.btn-confirm svg{width:16px;height:16px;stroke-width:2.5}
 
 .btn-secondary{
   padding:11px 14px;
-  background:rgba(255,255,255,.03);border:1px solid var(--bdr);
+  background:var(--stat-bg);border:1px solid var(--bdr);
   border-radius:12px;
   font-family:var(--f);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
   color:var(--t1);cursor:pointer;
   transition:background .2s,border-color .2s;
   display:flex;align-items:center;justify-content:center;gap:6px;
 }
-.btn-secondary:active{background:rgba(255,255,255,.06)}
+.btn-secondary:active{background:var(--stat-bg);border-color:var(--bdr2)}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-secondary svg{width:13px;height:13px;stroke-width:2}
 
-/* ══════════════════ LOG ══════════════════ */
-.log-card{padding:16px;gap:10px}
-.log-head{display:flex;justify-content:space-between;align-items:center}
+/* ══════════════════ JOURNAL ══════════════════ */
+.log-card{padding:16px;display:flex;flex-direction:column;gap:10px}
+.log-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .log-title{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--t2);text-transform:uppercase}
-.log-stats{display:flex;gap:6px}
+.log-stats{display:flex;gap:6px;flex-wrap:wrap}
 .log-chip{
   font-family:var(--m);font-size:9px;font-weight:600;
   padding:3px 8px;border-radius:6px;letter-spacing:.04em;
-  background:rgba(255,255,255,.03);border:1px solid var(--bdr);color:var(--t1);
+  background:var(--stat-bg);border:1px solid var(--bdr);color:var(--t1);
+  transition:background .35s,border-color .35s;
 }
 .log-chip .dim{color:var(--t2);margin-left:4px}
 
 .log-list{display:flex;flex-direction:column;gap:4px}
 .log-row{
   display:flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.022);border:1px solid transparent;
+  background:var(--stat-bg);border:1px solid transparent;
   border-radius:10px;padding:9px 11px;
   transition:background .15s,border-color .15s;
 }
-.log-row:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+.log-row:active{border-color:var(--bdr2)}
 .log-num{font-family:var(--m);font-size:9px;color:var(--t3);width:22px;flex-shrink:0;font-weight:600;text-align:right}
 .log-body{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.log-date{font-family:var(--m);font-size:10px;color:var(--t1);font-weight:600;letter-spacing:.02em}
+.log-date{font-family:var(--m);font-size:10.5px;color:var(--t1);font-weight:600;letter-spacing:.02em}
 .log-transition{font-family:var(--m);font-size:9px;color:var(--t2);letter-spacing:.02em}
 .log-arrows{display:flex;gap:4px;flex-shrink:0}
 .log-arr{
   width:22px;height:22px;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--m);font-size:10px;font-weight:700;
+  font-family:var(--m);font-size:11px;font-weight:700;
 }
-.la-rot{background:rgba(79,142,247,.1);color:var(--blue);border:1px solid rgba(79,142,247,.2)}
-.la-flip{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.22)}
+.la-rot{background:rgba(79,142,247,.1);color:var(--blue);border:1px solid rgba(79,142,247,.22)}
+.la-flip{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.24)}
+.la-turn{background:rgba(124,92,252,.1);color:var(--violet);border:1px solid rgba(124,92,252,.24)}
 
 .log-empty{
   padding:22px 14px;text-align:center;
-  font-family:var(--m);font-size:10px;color:var(--t2);letter-spacing:.05em;
-  background:rgba(255,255,255,.02);border:1px dashed var(--bdr);border-radius:12px;
+  font-family:var(--m);font-size:10.5px;color:var(--t2);letter-spacing:.03em;line-height:1.6;
+  background:var(--stat-bg);border:1px dashed var(--bdr);border-radius:12px;
 }
 
 /* ══════════════════ TOAST ══════════════════ */
 .toast{
-  position:fixed;bottom:calc(20px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(80px);
-  background:rgba(14,16,30,.95);
-  border:1px solid rgba(0,229,160,.3);
-  backdrop-filter:blur(20px);
+  position:fixed;bottom:calc(var(--tabbar-h) + var(--safe-b) + 14px);left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--c1);border:1px solid rgba(0,229,160,.3);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-radius:12px;padding:12px 18px;
   display:flex;align-items:center;gap:10px;
   font-family:var(--m);font-size:11px;font-weight:600;letter-spacing:.04em;
   color:var(--green);z-index:100;
-  box-shadow:0 10px 40px rgba(0,0,0,.7),0 0 30px rgba(0,229,160,.15);
+  box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 30px rgba(0,229,160,.15);
   opacity:0;transition:transform .4s cubic-bezier(.2,.8,.3,1),opacity .3s;
-  pointer-events:none;
+  pointer-events:none;max-width:calc(100% - 28px);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast svg{width:14px;height:14px}
+.toast svg{width:14px;height:14px;flex-shrink:0}
 
 /* ══════════════════ MODAL ══════════════════ */
 .modal-backdrop{
   position:fixed;inset:0;background:rgba(4,5,11,.75);backdrop-filter:blur(8px);
   z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
 }
+[data-theme="light"] .modal-backdrop{background:rgba(240,234,217,.82)}
 .modal-backdrop.show{display:flex}
 .modal{
   width:100%;max-width:360px;
@@ -436,20 +526,12 @@ body{
 .modal-text{font-family:var(--m);font-size:11px;color:var(--t2);line-height:1.5}
 .modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .btn-danger{
-  padding:11px;background:rgba(255,94,94,.1);border:1px solid rgba(255,94,94,.25);
+  padding:11px;background:rgba(255,94,94,.1);border:1px solid rgba(255,94,94,.3);
   border-radius:11px;color:var(--red);
   font-family:var(--f);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
   cursor:pointer;
 }
 .btn-danger:active{background:rgba(255,94,94,.16)}
-
-.footer{
-  padding:10px 4px 4px;text-align:center;
-  font-family:var(--m);font-size:8.5px;color:var(--t3);letter-spacing:.15em;
-}
-
-/* Rotation animation helper */
-.mattress.animating{transition:transform 1.1s cubic-bezier(.65,.05,.25,1)}
 </style>
 </head>
 <body>
@@ -463,7 +545,7 @@ body{
 
 <div class="app">
 
-  <!-- HEADER -->
+  <!-- ═══════ HEADER ═══════ -->
   <header class="hdr">
     <div class="hdr-brand">
       <div class="logo-mark">MX</div>
@@ -472,128 +554,177 @@ body{
         <div class="logo-sub">ROTATION · CONTROL</div>
       </div>
     </div>
-    <div class="live-pill">
-      <div class="live-dot"></div>
-      <span id="livePill">ACTIVE</span>
+    <div class="theme-toggle" id="themeToggle">
+      <div class="theme-slider"></div>
+      <button class="theme-btn active" data-t="dark" aria-label="Тёмная тема">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="theme-btn" data-t="light" aria-label="Светлая тема">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <!-- 3D SCENE -->
-  <section class="card scene-card ac-o">
-    <div class="scene-head">
-      <div class="scene-title">
-        <div class="scene-main">Текущая ориентация</div>
-        <div class="scene-meta" id="sinceLabel">—</div>
+  <!-- ═══════ VIEW: MATTRESS ═══════ -->
+  <section class="view active" id="view-mattress">
+
+    <div class="card picker">
+      <div class="picker-lbl">Тип матраса</div>
+      <div class="picker-tabs" id="pickerTabs">
+        <button class="picker-tab active" data-shape="square">Квадратный</button>
+        <button class="picker-tab" data-shape="rect">Прямоугольный</button>
       </div>
-      <div class="size-pill">200 × 200</div>
     </div>
 
-    <div class="scene-3d">
-      <div class="compass">
-        <div class="cp cp-n">N · СЕВЕР</div>
-        <div class="cp cp-e">E</div>
-        <div class="cp cp-s">S</div>
-        <div class="cp cp-w">W</div>
-      </div>
-      <div class="mattress" id="mattress">
-        <!-- TOP face A -->
-        <div class="face f-top">
-          <div class="quilt"></div>
-          <div class="head-band">HEAD</div>
-          <div class="foot-band">FOOT</div>
-          <div class="face-corner tl" id="cTL">A1</div>
-          <div class="face-corner tr" id="cTR">A2</div>
-          <div class="face-corner bl" id="cBL">A4</div>
-          <div class="face-corner br" id="cBR">A3</div>
-          <div class="face-label">
-            <div class="face-letter">A</div>
-            <div class="face-sub">Сторона A</div>
-          </div>
+    <section class="card scene-card ac-o">
+      <div class="scene-head">
+        <div class="scene-title">
+          <div class="scene-main">Текущая ориентация</div>
+          <div class="scene-meta" id="sinceLabel">—</div>
         </div>
-        <!-- BOTTOM face B -->
-        <div class="face f-bot">
-          <div class="quilt"></div>
-          <div class="head-band">HEAD</div>
-          <div class="foot-band">FOOT</div>
-          <div class="face-label">
-            <div class="face-letter">B</div>
-            <div class="face-sub">Сторона B</div>
-          </div>
+        <div class="size-pill" id="sizePill">200 × 200</div>
+      </div>
+
+      <div class="scene-3d" id="scene3d">
+        <div class="compass">
+          <div class="cp cp-n">N · СЕВЕР</div>
+          <div class="cp cp-e">E</div>
+          <div class="cp cp-s">S</div>
+          <div class="cp cp-w">W</div>
         </div>
-        <!-- SIDES -->
-        <div class="face f-side f-front"></div>
-        <div class="face f-side f-back"></div>
-        <div class="face f-side f-left"></div>
-        <div class="face f-side f-right"></div>
+        <div class="swipe-hint">↻ ПОТЯНИ</div>
+        <div class="mattress" id="mattress">
+          <div class="face f-top">
+            <div class="quilt"></div>
+            <div class="head-band">HEAD</div>
+            <div class="foot-band">FOOT</div>
+            <div class="face-label">
+              <div class="face-letter">A</div>
+              <div class="face-sub">Сторона A</div>
+            </div>
+          </div>
+          <div class="face f-bot">
+            <div class="quilt"></div>
+            <div class="head-band">HEAD</div>
+            <div class="foot-band">FOOT</div>
+            <div class="face-label">
+              <div class="face-letter">B</div>
+              <div class="face-sub">Сторона B</div>
+            </div>
+          </div>
+          <div class="face f-side f-front"></div>
+          <div class="face f-side f-back"></div>
+          <div class="face f-side f-left"></div>
+          <div class="face f-side f-right"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="state-row">
-      <div class="state-box">
-        <div class="state-lbl">Сторона сверху</div>
-        <div class="state-val"><span id="sideBadge" class="accent-o">A</span></div>
+      <div class="state-row">
+        <div class="state-box">
+          <div class="state-lbl">Сторона сверху</div>
+          <div class="state-val"><span id="sideBadge" class="accent-o">A</span></div>
+        </div>
+        <div class="state-box">
+          <div class="state-lbl">Изголовье смотрит</div>
+          <div class="state-val"><span id="dirBadge" class="accent-b">Север</span></div>
+        </div>
       </div>
-      <div class="state-box">
-        <div class="state-lbl">Изголовье смотрит</div>
-        <div class="state-val"><span id="rotBadge" class="accent-b">Север</span></div>
-      </div>
-    </div>
+    </section>
+
   </section>
 
-  <!-- RECOMMENDATION -->
-  <section class="card rec-card ac-g">
-    <div class="rec-head">
-      <div class="rec-title">Следующая смена</div>
-      <div class="rec-count" id="recCount">ШАГ · 1/8</div>
-    </div>
-    <div class="rec-hero">
-      <div class="rec-action" id="recAction">Повернуть на 90° по часовой</div>
-      <div class="rec-detail" id="recDetail">При смене белья сместите изголовье на правую боковину. Сторону не переворачиваем.</div>
-      <div class="rec-moves" id="recMoves">
-        <span class="move-chip mc-rot">↻ +90°</span>
+  <!-- ═══════ VIEW: CHANGE ═══════ -->
+  <section class="view" id="view-change">
+    <section class="card rec-card ac-g">
+      <div class="rec-head">
+        <div class="rec-title">Следующая смена</div>
+        <div class="rec-count" id="recCount">ШАГ · 1/4</div>
       </div>
-    </div>
+      <div class="rec-hero">
+        <div class="rec-action" id="recAction">—</div>
+        <div class="rec-detail" id="recDetail">—</div>
+        <div class="rec-moves" id="recMoves"></div>
+      </div>
 
-    <button class="btn-confirm" id="btnConfirm">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      Подтвердить смену
-    </button>
-
-    <div class="btn-row">
-      <button class="btn-secondary" id="btnReset">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 10 9 10"/>
+      <button class="btn-confirm" id="btnConfirm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        Сброс
+        Подтвердить смену
       </button>
-      <button class="btn-secondary" id="btnExport">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Экспорт
-      </button>
-    </div>
-  </section>
 
-  <!-- LOG -->
-  <section class="card log-card ac-b">
-    <div class="log-head">
-      <div class="log-title">Журнал смен</div>
-      <div class="log-stats">
-        <div class="log-chip"><span id="totalCount">0</span><span class="dim">всего</span></div>
-        <div class="log-chip"><span id="daysCount">—</span><span class="dim">дн. назад</span></div>
+      <div class="btn-row">
+        <button class="btn-secondary" id="btnReset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 10 9 10"/>
+          </svg>
+          Сброс
+        </button>
+        <button class="btn-secondary" id="btnExport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Экспорт
+        </button>
       </div>
-    </div>
-    <div class="log-list" id="logList">
-      <div class="log-empty">Журнал пуст. Подтвердите первую смену, чтобы начать отсчёт.</div>
-    </div>
+    </section>
   </section>
 
-  <div class="footer">MATRAX · v1.0 · ЛОКАЛЬНОЕ ХРАНЕНИЕ</div>
+  <!-- ═══════ VIEW: LOG ═══════ -->
+  <section class="view" id="view-log">
+    <section class="card log-card ac-b">
+      <div class="log-head">
+        <div class="log-title">Журнал смен</div>
+        <div class="log-stats">
+          <div class="log-chip"><span id="totalCount">0</span><span class="dim">всего</span></div>
+          <div class="log-chip"><span id="daysCount">—</span><span class="dim">дн. назад</span></div>
+        </div>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="log-empty">Журнал пуст.<br>Подтвердите первую смену, чтобы начать отсчёт.</div>
+      </div>
+    </section>
+  </section>
+
 </div>
+
+<!-- ═══════ BOTTOM TABBAR ═══════ -->
+<nav class="tabbar">
+  <div class="tabbar-inner">
+    <button class="tab-btn active" data-view="mattress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="7" width="18" height="12" rx="3"/>
+        <path d="M3 11h18M8 7v12M16 7v12"/>
+      </svg>
+      <span class="tab-label">Матрас</span>
+    </button>
+    <button class="tab-btn" data-view="change">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+        <polyline points="21 3 21 8 16 8"/>
+        <polyline points="3 21 3 16 8 16"/>
+      </svg>
+      <span class="tab-label">Смена</span>
+    </button>
+    <button class="tab-btn" data-view="log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/>
+        <line x1="8" y1="17" x2="13" y2="17"/>
+      </svg>
+      <span class="tab-label">Журнал</span>
+      <span class="tab-badge hidden" id="tabBadge">0</span>
+    </button>
+  </div>
+</nav>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
@@ -617,113 +748,86 @@ body{
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   MATRAX · mattress rotation tracker
+   MATRAX v2 · Support for square (4-step) and rect (2-step) cycles
    
-   STATE MODEL
-   ─ state = { side: 'A'|'B', dir: 'N'|'E'|'S'|'W' }
-   ─ side: какая сторона сейчас сверху
-   ─ dir:  куда смотрит изголовье (HEAD): N=Север, E=Восток, S=Юг, W=Запад
-   
-   CYCLE (8 шагов — чередуем flip и поворот на 90° вправо):
-   
-   STEP 0: A, Север     ← старт
-   STEP 1: B, Север      (flip: A→B)
-   STEP 2: B, Запад      (поворот 90° вправо: Север→Запад)
-   STEP 3: A, Запад      (flip: B→A)
-   STEP 4: A, Юг         (поворот 90° вправо: Запад→Юг)
-   STEP 5: B, Юг         (flip: A→B)
-   STEP 6: B, Восток     (поворот 90° вправо: Юг→Восток)
-   STEP 7: A, Восток     (flip: B→A)
-   STEP 8→0: A, Север    (поворот 90° вправо: Восток→Север) — полный цикл
-
-   Полный цикл = 8 смен белья. Все 4 ориентации × 2 стороны.
+   SQUARE (200×200): flip + rotate 90° вправо одновременно
+     A·N → B·W → A·S → B·E → A·N (full cycle = 4 смены)
+     
+   RECT (прямоугольный): flip + разворот Head↔Foot одновременно  
+     A·N → B·S → A·N (full cycle = 2 смены)
+     (dir = N означает Head на Север, dir = S — на Юг)
 ═══════════════════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'matrax_state_v2';
-const LOG_KEY = 'matrax_log_v2';
+const STORAGE_KEY = 'matrax_state_v3';
+const LOG_KEY = 'matrax_log_v3';
+const THEME_KEY = 'matrax_theme_v1';
 
-const CYCLE = [
-  { side:'A', dir:'N' },  // 0 · старт
-  { side:'B', dir:'N' },  // 1 · flip
-  { side:'B', dir:'W' },  // 2 · rotate
-  { side:'A', dir:'W' },  // 3 · flip
-  { side:'A', dir:'S' },  // 4 · rotate
-  { side:'B', dir:'S' },  // 5 · flip
-  { side:'B', dir:'E' },  // 6 · rotate
-  { side:'A', dir:'E' },  // 7 · flip
-  // next loops back to step 0 (rotate: E → N)
-];
+const CYCLES = {
+  square: [
+    { side:'A', dir:'N' },
+    { side:'B', dir:'W' },
+    { side:'A', dir:'S' },
+    { side:'B', dir:'E' },
+  ],
+  rect: [
+    { side:'A', dir:'N' },
+    { side:'B', dir:'S' },
+  ],
+};
 
-// Маппинг направления изголовья в визуальный угол Z
-// Север=0°, Запад=90° (вправо = по часовой при виде сверху), Юг=180°, Восток=270°
 const DIR_TO_DEG = { N:0, W:90, S:180, E:270 };
 const DIR_RU = { N:'Север', W:'Запад', S:'Юг', E:'Восток' };
 const DIR_EN = { N:'N', W:'W', S:'S', E:'E' };
 
-const STEP_TEXT = [
-  // i описывает переход step i → i+1
-  { // 0 → 1
-    action: 'Перевернуть матрас: A → B',
-    detail: 'Переверните матрас на другую сторону. Изголовье остаётся на Севере, сверху теперь сторона B.',
-    chips: ['flip'],
-  },
-  { // 1 → 2
-    action: 'Повернуть на 90° вправо',
-    detail: 'Проверните матрас по часовой. Изголовье переезжает с Севера на Запад. Сторону не трогаем — B остаётся сверху.',
-    chips: ['rot'],
-  },
-  { // 2 → 3
-    action: 'Перевернуть матрас: B → A',
-    detail: 'Переверните матрас. Изголовье остаётся на Западе, сверху снова сторона A.',
-    chips: ['flip'],
-  },
-  { // 3 → 4
-    action: 'Повернуть на 90° вправо',
-    detail: 'Проверните матрас по часовой. Изголовье переезжает с Запада на Юг. Сторона A сверху.',
-    chips: ['rot'],
-  },
-  { // 4 → 5
-    action: 'Перевернуть матрас: A → B',
-    detail: 'Переверните матрас. Изголовье остаётся на Юге, сверху теперь B.',
-    chips: ['flip'],
-  },
-  { // 5 → 6
-    action: 'Повернуть на 90° вправо',
-    detail: 'Проверните матрас по часовой. Изголовье переезжает с Юга на Восток. Сторона B сверху.',
-    chips: ['rot'],
-  },
-  { // 6 → 7
-    action: 'Перевернуть матрас: B → A',
-    detail: 'Переверните матрас. Изголовье остаётся на Востоке, сверху снова сторона A.',
-    chips: ['flip'],
-  },
-  { // 7 → 0
-    action: 'Повернуть на 90° вправо',
-    detail: 'Проверните матрас по часовой. Изголовье возвращается на Север — полный цикл завершён!',
-    chips: ['rot'],
-  },
-];
+const STEP_TEXTS = {
+  square: [
+    { // 0→1 : A·N → B·W
+      action: 'Flip + поворот 90° вправо',
+      detail: 'Перевернуть матрас (сверху станет B) и повернуть по часовой — изголовье с Севера переезжает на Запад.',
+      chips: ['flip','rot'],
+    },
+    { // 1→2 : B·W → A·S
+      action: 'Flip + поворот 90° вправо',
+      detail: 'Перевернуть (обратно на A) и повернуть по часовой — изголовье переезжает с Запада на Юг.',
+      chips: ['flip','rot'],
+    },
+    { // 2→3 : A·S → B·E
+      action: 'Flip + поворот 90° вправо',
+      detail: 'Перевернуть (на B) и повернуть по часовой — изголовье переезжает с Юга на Восток.',
+      chips: ['flip','rot'],
+    },
+    { // 3→0 : B·E → A·N
+      action: 'Flip + поворот 90° вправо',
+      detail: 'Перевернуть (на A) и повернуть по часовой — изголовье возвращается на Север. Полный цикл завершён!',
+      chips: ['flip','rot'],
+    },
+  ],
+  rect: [
+    { // 0→1 : A·N → B·S
+      action: 'Flip + разворот Head ↔ Foot',
+      detail: 'Перевернуть матрас (сверху станет B) и развернуть на 180° — там, где было изголовье, теперь стопы.',
+      chips: ['flip','turn'],
+    },
+    { // 1→0 : B·S → A·N
+      action: 'Flip + разворот Head ↔ Foot',
+      detail: 'Перевернуть (обратно на A) и развернуть на 180° — изголовье возвращается на Север. Полный цикл завершён!',
+      chips: ['flip','turn'],
+    },
+  ],
+};
 
 /* ─────────────── STATE ─────────────── */
-let state = loadState();
-let log = loadLog();
-let animLock = false;
-// visual rotation accumulator to avoid reverse-spin
-let visualRotY = 0;
-let visualRotZ = 0;
-
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return { step:0, lastChange:null };
+    if(!raw) return { shape:'square', step:0, lastChange:null };
     const p = JSON.parse(raw);
-    if(typeof p.step !== 'number') return { step:0, lastChange:null };
+    if(!CYCLES[p.shape]) p.shape = 'square';
+    if(typeof p.step !== 'number' || p.step >= CYCLES[p.shape].length) p.step = 0;
     return p;
-  }catch(e){ return { step:0, lastChange:null }; }
+  }catch(e){ return { shape:'square', step:0, lastChange:null }; }
 }
-function saveState(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 function loadLog(){
   try{
     const raw = localStorage.getItem(LOG_KEY);
@@ -732,16 +836,24 @@ function loadLog(){
     return Array.isArray(p) ? p : [];
   }catch(e){ return []; }
 }
-function saveLog(){
-  try{ localStorage.setItem(LOG_KEY, JSON.stringify(log)); }catch(e){}
-}
+function saveLog(){ try{ localStorage.setItem(LOG_KEY, JSON.stringify(log)); }catch(e){} }
+
+let state = loadState();
+let log = loadLog();
+let animLock = false;
+let visualRotY = 0;  // accumulated, tracks flip
+let visualRotZ = 0;  // accumulated, tracks head direction
 
 /* ─────────────── DOM ─────────────── */
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
 const mattress = $('#mattress');
+const scene3d = $('#scene3d');
 const sideBadge = $('#sideBadge');
-const rotBadge = $('#rotBadge');
+const dirBadge = $('#dirBadge');
 const sinceLabel = $('#sinceLabel');
+const sizePill = $('#sizePill');
 const recAction = $('#recAction');
 const recDetail = $('#recDetail');
 const recMoves = $('#recMoves');
@@ -749,11 +861,103 @@ const recCount = $('#recCount');
 const logList = $('#logList');
 const totalCount = $('#totalCount');
 const daysCount = $('#daysCount');
+const tabBadge = $('#tabBadge');
 const toast = $('#toast');
 const toastText = $('#toastText');
 const modal = $('#modal');
 
-/* ─────────────── FORMATTING ─────────────── */
+/* ─────────────── MATTRESS GEOMETRY ─────────────── */
+// Квадратный — 210×210, прямоугольный — 150×220 (условно 160×220 пропорции кровати)
+function geometryFor(shape){
+  if(shape === 'rect') return { w:150, h:220, thickness:36 };
+  return { w:210, h:210, thickness:36 };
+}
+
+function applyGeometry(){
+  const g = geometryFor(state.shape);
+  const t = g.thickness;
+  const half = t/2;
+  
+  mattress.style.width = g.w+'px';
+  mattress.style.height = g.h+'px';
+  
+  const top = mattress.querySelector('.f-top');
+  const bot = mattress.querySelector('.f-bot');
+  top.style.width = g.w+'px'; top.style.height = g.h+'px';
+  top.style.transform = `translateZ(${half}px)`;
+  bot.style.width = g.w+'px'; bot.style.height = g.h+'px';
+  bot.style.transform = `translateZ(${-half}px) rotateY(180deg)`;
+  
+  const front = mattress.querySelector('.f-front');
+  const back = mattress.querySelector('.f-back');
+  const left = mattress.querySelector('.f-left');
+  const right = mattress.querySelector('.f-right');
+  
+  front.style.width = g.w+'px'; front.style.height = t+'px';
+  front.style.transform = `rotateX(90deg) translateZ(${half}px) translateY(-${half}px)`;
+  
+  back.style.width = g.w+'px'; back.style.height = t+'px';
+  back.style.transform = `rotateX(-90deg) translateZ(${g.h - half}px) translateY(-${half}px)`;
+  
+  left.style.width = t+'px'; left.style.height = g.h+'px';
+  left.style.transform = `rotateY(-90deg) translateZ(${half}px) translateX(-${half}px)`;
+  
+  right.style.width = t+'px'; right.style.height = g.h+'px';
+  right.style.transform = `rotateY(90deg) translateZ(${g.w - half}px) translateX(-${half}px)`;
+  
+  sizePill.textContent = (shape => {
+    if(shape === 'rect') return '≠ Прямоугольный';
+    return '200 × 200';
+  })(state.shape);
+}
+
+/* ─────────────── RENDER ─────────────── */
+function shortestDelta(from, to){
+  return ((to - from) % 360 + 540) % 360 - 180;
+}
+
+function render3D(animated){
+  const cycle = CYCLES[state.shape];
+  const current = cycle[state.step];
+  const targetRotY = (current.side === 'B') ? 180 : 0;
+  const targetRotZ = DIR_TO_DEG[current.dir];
+  
+  const deltaY = shortestDelta(visualRotY % 360, targetRotY);
+  const deltaZ = shortestDelta(visualRotZ % 360, targetRotZ);
+  visualRotY += deltaY;
+  visualRotZ += deltaZ;
+  
+  mattress.style.transition = animated ? 'transform 1.1s cubic-bezier(.65,.05,.25,1)' : 'transform 0s';
+  mattress.style.transform = `rotateX(-22deg) rotateY(${visualRotY}deg) rotateZ(${visualRotZ}deg)`;
+}
+
+function render(animated){
+  const cycle = CYCLES[state.shape];
+  const current = cycle[state.step];
+  const stepTexts = STEP_TEXTS[state.shape];
+  const rec = stepTexts[state.step];
+  
+  sideBadge.textContent = current.side;
+  sideBadge.className = current.side === 'A' ? 'accent-o' : 'accent-v';
+  dirBadge.textContent = DIR_RU[current.dir];
+  
+  sinceLabel.textContent = fmtSince(state.lastChange);
+  
+  recAction.textContent = rec.action;
+  recDetail.textContent = rec.detail;
+  recCount.textContent = 'ШАГ · ' + (state.step+1) + '/' + cycle.length;
+  recMoves.innerHTML = rec.chips.map(c => {
+    if(c === 'rot') return '<span class="move-chip mc-rot">↻ +90° вправо</span>';
+    if(c === 'flip') return '<span class="move-chip mc-flip">⇅ flip A↔B</span>';
+    if(c === 'turn') return '<span class="move-chip mc-turn">⇄ Head↔Foot</span>';
+    return '';
+  }).join('');
+  
+  render3D(animated);
+  renderLog();
+}
+
+/* ─────────────── LOG ─────────────── */
 function pad2(n){ return n<10?'0'+n:''+n; }
 function fmtDate(ts){
   const d = new Date(ts);
@@ -761,16 +965,15 @@ function fmtDate(ts){
          ' · '+pad2(d.getHours())+':'+pad2(d.getMinutes());
 }
 function fmtSince(ts){
-  if(!ts) return 'Без смен · установите стартовую позицию';
+  if(!ts) return 'Без смен · стартовая позиция';
   const diff = Date.now() - ts;
-  const sec = Math.floor(diff/1000);
-  const min = Math.floor(sec/60);
+  const min = Math.floor(diff/60000);
   const hr = Math.floor(min/60);
   const day = Math.floor(hr/24);
-  if(day >= 1) return 'Последняя смена · '+day+' '+plural(day,['день','дня','дней'])+' назад';
-  if(hr >= 1) return 'Последняя смена · '+hr+' '+plural(hr,['час','часа','часов'])+' назад';
-  if(min >= 1) return 'Последняя смена · '+min+' мин. назад';
-  return 'Последняя смена · только что';
+  if(day >= 1) return 'Последняя · '+day+' '+plural(day,['день','дня','дней'])+' назад';
+  if(hr >= 1) return 'Последняя · '+hr+' '+plural(hr,['час','часа','часов'])+' назад';
+  if(min >= 1) return 'Последняя · '+min+' мин. назад';
+  return 'Последняя · только что';
 }
 function plural(n, forms){
   const n10 = n%10, n100 = n%100;
@@ -779,87 +982,36 @@ function plural(n, forms){
   return forms[2];
 }
 
-/* ─────────────── RENDER 3D ─────────────── */
-function render3D(animated){
-  const current = CYCLE[state.step];
-  // Y = flip сторона (0 = A сверху, 180 = B сверху)
-  // Z = направление изголовья (N=0, W=90, S=180, E=270)
-  const targetRotY = (current.side === 'B') ? 180 : 0;
-  const targetRotZ = DIR_TO_DEG[current.dir];
-
-  // Выбираем кратчайшее направление поворота, чтобы не было обратного вращения
-  const deltaY = shortestDelta(visualRotY % 360, targetRotY);
-  const deltaZ = shortestDelta(visualRotZ % 360, targetRotZ);
-  visualRotY += deltaY;
-  visualRotZ += deltaZ;
-
-  mattress.style.transition = animated ? 'transform 1.1s cubic-bezier(.65,.05,.25,1)' : 'transform 0s';
-  mattress.style.transform = 'rotateX(-22deg) rotateY('+visualRotY+'deg) rotateZ('+visualRotZ+'deg)';
-}
-function shortestDelta(from, to){
-  let d = ((to - from) % 360 + 540) % 360 - 180;
-  return d;
-}
-
-/* ─────────────── RENDER UI ─────────────── */
-function render(animated){
-  const current = CYCLE[state.step];
-  const rec = STEP_TEXT[state.step];
-
-  // side & direction badges
-  sideBadge.textContent = current.side;
-  sideBadge.className = current.side === 'A' ? 'accent-o' : 'accent-v';
-  rotBadge.textContent = DIR_RU[current.dir];
-  rotBadge.className = 'accent-b';
-
-  // since
-  sinceLabel.textContent = fmtSince(state.lastChange);
-
-  // recommendation
-  recAction.textContent = rec.action;
-  recDetail.textContent = rec.detail;
-  recCount.textContent = 'ШАГ · ' + (state.step+1) + '/8';
-  recMoves.innerHTML = rec.chips.map(c => {
-    if(c === 'rot') return '<span class="move-chip mc-rot">↻ +90° вправо</span>';
-    if(c === 'flip') return '<span class="move-chip mc-flip">⇅ flip стороны</span>';
-    return '';
-  }).join('');
-
-  // 3D
-  render3D(animated);
-
-  // log
-  renderLog();
-}
-
 function renderLog(){
   totalCount.textContent = log.length;
+  tabBadge.textContent = log.length;
+  tabBadge.classList.toggle('hidden', log.length === 0);
+  
   if(log.length === 0){
     daysCount.textContent = '—';
-    logList.innerHTML = '<div class="log-empty">Журнал пуст. Подтвердите первую смену, чтобы начать отсчёт.</div>';
+    logList.innerHTML = '<div class="log-empty">Журнал пуст.<br>Подтвердите первую смену, чтобы начать отсчёт.</div>';
     return;
   }
   const last = log[log.length-1];
-  const daysSince = Math.floor((Date.now() - last.ts) / (1000*60*60*24));
+  const daysSince = Math.floor((Date.now() - last.ts) / 86400000);
   daysCount.textContent = daysSince;
-
-  // reverse chronological
+  
   const rows = [];
   for(let i = log.length-1; i >= 0; i--){
     const e = log[i];
-    const from = e.from;
-    const to = e.to;
     const arrows = [];
-    if(e.rotated) arrows.push('<div class="log-arr la-rot" title="Поворот +90° вправо">↻</div>');
-    if(e.flipped) arrows.push('<div class="log-arr la-flip" title="Flip стороны">⇅</div>');
-    const fromStr = from.side + '·' + DIR_EN[from.dir];
-    const toStr = to.side + '·' + DIR_EN[to.dir];
+    if(e.flipped) arrows.push('<div class="log-arr la-flip" title="Flip">⇅</div>');
+    if(e.rotated) arrows.push('<div class="log-arr la-rot" title="Поворот 90°">↻</div>');
+    if(e.turned) arrows.push('<div class="log-arr la-turn" title="Head↔Foot">⇄</div>');
+    const shape = e.shape === 'rect' ? '▭' : '■';
+    const fromStr = e.from.side+'·'+DIR_EN[e.from.dir];
+    const toStr = e.to.side+'·'+DIR_EN[e.to.dir];
     rows.push(
       '<div class="log-row">'+
         '<div class="log-num">'+(i+1).toString().padStart(2,'0')+'</div>'+
         '<div class="log-body">'+
           '<div class="log-date">'+fmtDate(e.ts)+'</div>'+
-          '<div class="log-transition">'+fromStr+' → '+toStr+'</div>'+
+          '<div class="log-transition">'+shape+' '+fromStr+' → '+toStr+'</div>'+
         '</div>'+
         '<div class="log-arrows">'+arrows.join('')+'</div>'+
       '</div>'
@@ -872,16 +1024,20 @@ function renderLog(){
 function confirmChange(){
   if(animLock) return;
   animLock = true;
-
-  const from = {...CYCLE[state.step]};
-  const nextStep = (state.step + 1) % CYCLE.length;
-  const to = {...CYCLE[nextStep]};
-  const rotated = from.dir !== to.dir;
+  
+  const cycle = CYCLES[state.shape];
+  const from = {...cycle[state.step]};
+  const nextStep = (state.step + 1) % cycle.length;
+  const to = {...cycle[nextStep]};
+  
+  const rotated = state.shape === 'square' && from.dir !== to.dir;
+  const turned = state.shape === 'rect' && from.dir !== to.dir;
   const flipped = from.side !== to.side;
-
+  
   const entry = {
     ts: Date.now(),
-    from, to, rotated, flipped,
+    shape: state.shape,
+    from, to, rotated, flipped, turned,
     step: nextStep,
   };
   log.push(entry);
@@ -889,18 +1045,16 @@ function confirmChange(){
   state.lastChange = entry.ts;
   saveState();
   saveLog();
-
+  
   render(true);
   showToast('Смена зафиксирована · ' + fmtDate(entry.ts).split(' · ')[1]);
-
-  // haptic
   if(navigator.vibrate) navigator.vibrate(15);
-
-  setTimeout(()=>{ animLock = false; }, 1150);
+  
+  setTimeout(() => { animLock = false; }, 1150);
 }
 
 function resetAll(){
-  state = { step:0, lastChange:null };
+  state = { shape: state.shape, step:0, lastChange:null };
   log = [];
   visualRotY = 0;
   visualRotZ = 0;
@@ -913,15 +1067,14 @@ function resetAll(){
 function exportLog(){
   const data = {
     exportedAt: new Date().toISOString(),
-    state: state,
-    currentPosition: CYCLE[state.step],
+    state,
+    currentPosition: CYCLES[state.shape][state.step],
     log: log.map(e => ({
       timestamp: new Date(e.ts).toISOString(),
       timestampLocal: fmtDate(e.ts),
-      from: e.from,
-      to: e.to,
-      rotated: e.rotated,
-      flipped: e.flipped,
+      shape: e.shape,
+      from: e.from, to: e.to,
+      flipped: e.flipped, rotated: e.rotated, turned: e.turned,
     })),
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -936,7 +1089,93 @@ function exportLog(){
   showToast('Экспортировано · '+log.length+' записей');
 }
 
-/* ─────────────── TOAST ─────────────── */
+/* ─────────────── SHAPE SWITCH ─────────────── */
+function switchShape(newShape){
+  if(state.shape === newShape) return;
+  // если меняем тип — сбрасываем шаг на 0 (чтобы не было несовместимых состояний)
+  state.shape = newShape;
+  state.step = 0;
+  state.lastChange = null;
+  visualRotY = 0;
+  visualRotZ = 0;
+  saveState();
+  applyGeometry();
+  render(true);
+  $$('.picker-tab').forEach(b => b.classList.toggle('active', b.dataset.shape === newShape));
+  showToast('Тип матраса · ' + (newShape === 'square' ? 'квадратный' : 'прямоугольный'));
+}
+
+/* ─────────────── THEME ─────────────── */
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  $$('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+  const meta = $('#themeColorMeta');
+  if(meta) meta.setAttribute('content', t === 'light' ? '#f0ead9' : '#04050b');
+}
+function loadTheme(){
+  try{
+    const t = localStorage.getItem(THEME_KEY);
+    if(t === 'light' || t === 'dark') setTheme(t);
+  }catch(e){}
+}
+
+/* ─────────────── TABS ─────────────── */
+function switchView(v){
+  $$('.view').forEach(el => el.classList.toggle('active', el.id === 'view-'+v));
+  $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ─────────────── 3D DRAG (touch & mouse, returns to state) ─────────────── */
+let drag = null;
+function setupDrag(){
+  const onStart = (x, y) => {
+    if(animLock) return;
+    drag = {
+      startX:x, startY:y,
+      baseY:visualRotY, baseZ:visualRotZ,
+    };
+    mattress.classList.add('dragging');
+    scene3d.classList.add('touched');
+  };
+  const onMove = (x, y) => {
+    if(!drag) return;
+    const dx = x - drag.startX;
+    const dy = y - drag.startY;
+    // горизонтальный свайп = поворот Z (вокруг вертикальной оси)
+    // вертикальный свайп = flip (Y)
+    const z = drag.baseZ + dx * 0.6;
+    const y2 = drag.baseY + dy * 0.6;
+    mattress.style.transform = `rotateX(-22deg) rotateY(${y2}deg) rotateZ(${z}deg)`;
+  };
+  const onEnd = () => {
+    if(!drag) return;
+    drag = null;
+    mattress.classList.remove('dragging');
+    // вернуть к правильному состоянию (анимация)
+    render3D(true);
+  };
+  
+  scene3d.addEventListener('touchstart', e => {
+    if(e.touches.length !== 1) return;
+    onStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+  scene3d.addEventListener('touchmove', e => {
+    if(e.touches.length !== 1) return;
+    onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+  scene3d.addEventListener('touchend', onEnd);
+  scene3d.addEventListener('touchcancel', onEnd);
+  
+  // mouse (для десктопного теста)
+  let mousedown = false;
+  scene3d.addEventListener('mousedown', e => { mousedown = true; onStart(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e => { if(mousedown) onMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => { if(mousedown){ mousedown = false; onEnd(); }});
+}
+
+/* ─────────────── TOAST / MODAL ─────────────── */
 let toastTimer = null;
 function showToast(msg){
   toastText.textContent = msg;
@@ -944,8 +1183,6 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>toast.classList.remove('show'), 2400);
 }
-
-/* ─────────────── MODAL ─────────────── */
 function openModal(){ modal.classList.add('show'); }
 function closeModal(){ modal.classList.remove('show'); }
 
@@ -955,23 +1192,34 @@ $('#btnReset').addEventListener('click', openModal);
 $('#btnCancel').addEventListener('click', closeModal);
 $('#btnConfirmReset').addEventListener('click', ()=>{ resetAll(); closeModal(); });
 $('#btnExport').addEventListener('click', exportLog);
-modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
 
-// update "since" label every 30s
-setInterval(()=>{ sinceLabel.textContent = fmtSince(state.lastChange); }, 30000);
+$$('.picker-tab').forEach(b => {
+  b.addEventListener('click', () => switchShape(b.dataset.shape));
+});
+$$('.theme-btn').forEach(b => {
+  b.addEventListener('click', () => setTheme(b.dataset.t));
+});
+$$('.tab-btn').forEach(b => {
+  b.addEventListener('click', () => switchView(b.dataset.view));
+});
+
+setInterval(() => { sinceLabel.textContent = fmtSince(state.lastChange); }, 30000);
 
 /* ─────────────── INIT ─────────────── */
-// Set visual accumulator to match saved state on first paint (no animation)
-const initial = CYCLE[state.step];
+loadTheme();
+$$('.picker-tab').forEach(b => b.classList.toggle('active', b.dataset.shape === state.shape));
+applyGeometry();
+
+const initial = CYCLES[state.shape][state.step];
 visualRotY = initial.side === 'B' ? 180 : 0;
 visualRotZ = DIR_TO_DEG[initial.dir];
 render(false);
+setupDrag();
 
-// Service worker for PWA / offline
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 </script>
-
 </body>
 </html>

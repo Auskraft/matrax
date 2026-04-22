@@ -13,6 +13,15 @@ PWA и Android приложение для отслеживания ротаци
 | 🌐 PWA (браузер) | [auskraft.github.io/matrax](https://auskraft.github.io/matrax/) |
 | 📱 Android APK | [Скачать v1.0.0](https://github.com/Auskraft/matrax/releases/tag/v1.0.0) |
 
+## Скриншоты
+
+<p float="left">
+  <img src="screenshots/photo_2026-04-22_13-09-19.jpg" width="22%" />
+  <img src="screenshots/photo_2026-04-22_13-09-20.jpg" width="22%" />
+  <img src="screenshots/photo_2026-04-22_13-09-19 (2).jpg" width="22%" />
+  <img src="screenshots/photo_2026-04-22_13-09-20 (2).jpg" width="22%" />
+</p>
+
 ## Что делает
 
 Показывает текущую ориентацию матраса в 3D. Даёт рекомендацию на следующую смену: куда повернуть, какой стороной положить. Пишет в журнал дату, время и тип смены.
